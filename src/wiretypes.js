@@ -48,6 +48,10 @@ class Output extends WireType {
     ]
   }
 
+  hashID() {
+    throw new TypeError("Don't use hashID for outputs, use (txID,idx)")
+  }
+
   static fromRLP (L) {
     return new Output({
       left: bn(L[0]),

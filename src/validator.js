@@ -24,7 +24,7 @@ class Validator {
     // assert work > latest.work / 2
     // assert block.prevTotalWork = latest.prevTotalWork + latest.work
 
-    need(state.headers.has(header.prev), 'chain needs to contain block.prev')
+    need(state.headers.has(header.prev), 'evaluate given a state, but it does not contain block.prev')
 
     block.remerk()
     need(block.header == header, 'merkle root must verify')
@@ -44,7 +44,7 @@ class Validator {
       // action aggregate conditions
     }
     // block aggregate conditions
-    return [null, [[], []]]
+    return state
   }
 }
 

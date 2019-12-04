@@ -25,7 +25,7 @@ describe('mini wire types', () => {
       quorum: 2,
       pubkeyidx: Array([0, 1, 2])
     })
-    const fakeTrxHash = output.hashID()
+    const fakeTrxHash = Buffer(32).fill(7)
     const input = new mini.Input({
       action: fakeTrxHash,
       index: 0
@@ -44,7 +44,7 @@ describe('mini wire types', () => {
       quorum: 2,
       pubkeyidx: Array([0, 1, 2])
     })
-    const fakeTrxHash = output.hashID()
+    const fakeTrxHash = Buffer(32).fill(7)
     const input = new mini.Input({
       action: fakeTrxHash,
       index: 0
@@ -89,7 +89,7 @@ describe('mini wire types', () => {
       quorum: 2,
       pubkeyidx: [0, 1, 2]
     })
-    const fakeTrxHash = output.hashID()
+    const fakeTrxHash = Buffer(32).fill(7)
     const input = new mini.Input({
       action: fakeTrxHash,
       index: 0
