@@ -1,4 +1,4 @@
-const mini = require('../src/wiretypes.js')
+const mini = require('../index.js')
 const want = require('chai').expect
 const BN = require('bn.js')
 const bn = (n) => new BN(n)
@@ -27,9 +27,9 @@ describe('mini wire types', () => {
     })
     const fakeTrxHash = output.hashID()
     const input = new mini.Input({
-        action: fakeTrxHash,
-        index: 0
-    });
+      action: fakeTrxHash,
+      index: 0
+    })
     const encoded = input.serialize()
     const decoded = mini.Input.fromBytes(encoded)
     want(input.listify()).deep.equal(decoded.listify())
@@ -46,9 +46,9 @@ describe('mini wire types', () => {
     })
     const fakeTrxHash = output.hashID()
     const input = new mini.Input({
-        action: fakeTrxHash,
-        index: 0
-    });
+      action: fakeTrxHash,
+      index: 0
+    })
     const action = new mini.Action({
       confirmHeader: new Buffer('header'),
       validSince: 0,
@@ -68,6 +68,7 @@ describe('mini wire types', () => {
   it('header', () => {
     const header = new mini.Header({
       prev: Buffer('prev'),
+      prevTotalWork: Buffer('prevTotalWork'),
       actroot: Buffer('root'),
       miner: Buffer('miner'),
       time: Buffer('time'),
@@ -88,12 +89,11 @@ describe('mini wire types', () => {
       quorum: 2,
       pubkeyidx: [0, 1, 2]
     })
-    console.log(output)
     const fakeTrxHash = output.hashID()
     const input = new mini.Input({
-        action: fakeTrxHash,
-        index: 0
-    });
+      action: fakeTrxHash,
+      index: 0
+    })
     const action = new mini.Action({
       confirmHeader: new Buffer('header'),
       validSince: 0,
@@ -106,12 +106,12 @@ describe('mini wire types', () => {
     })
     const header = new mini.Header({
       prev: Buffer('prev'),
+      prevTotalWork: Buffer('prevTotalWork'),
       actroot: Buffer('root'),
       miner: Buffer('miner'),
       time: Buffer('time'),
       work: Buffer('work')
     })
-
 
     const block = new mini.Block({
       header: header,

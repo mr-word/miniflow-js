@@ -1,11 +1,13 @@
+const debug = require('debug')('miniflow')
 const rlp = require('rlp')
 const BN = require('bn.js')
 const bn = (n) => new BN(n)
 
 const { hash } = require('../src/crypto.js')
+const { merkelize } = require('../src/merkle.js')
 
 class WireType {
-  static fromRLP(L) {
+  static fromRLP (L) {
     throw new TypeError('tried to instantiate (fromRLP/fromBytes) an abstract type - WireType should be extended)')
   }
 
@@ -46,7 +48,7 @@ class Output extends WireType {
     ]
   }
 
-  static fromRLP(L) {
+  static fromRLP (L) {
     return new Output({
       left: bn(L[0]),
       right: bn(L[1]),
@@ -71,16 +73,16 @@ class Input extends WireType {
     ]
   }
 
-  static fromRLP(L) {
+  static fromRLP (L) {
     return new Input({
       action: L[0],
-      index: bn(L[1]),
-    });
+      index: bn(L[1])
+    })
   }
 }
 
 class Action extends WireType {
-  constructor (args) { 
+  constructor (args) {
     super()
     this.confirmHeader = args.confirmHeader
     this.validSince = bn(args.validSince)
@@ -103,16 +105,19 @@ class Action extends WireType {
     ]
   }
 
-  static fromRLP(L) {
-    console.log(L)
+  getOutputTag (n) {
+    return rlp.encode(this.hashID(), bn(n))
+  }
+
+  static fromRLP (L) {
     return new Action({
-        confirmHeader: L[0],
-        validSince: bn(L[1]),
-        validUntil: bn(L[2]),
-        inputs: L[3].map((x)=>Input.fromRLP(x)),
-        outputs: L[4].map((x)=>Output.fromRLP(x)),
-        pubkeys: L[5],
-        signatures: L[6],
+      confirmHeader: L[0],
+      validSince: bn(L[1]),
+      validUntil: bn(L[2]),
+      inputs: L[3].map((x) => Input.fromRLP(x)),
+      outputs: L[4].map((x) => Output.fromRLP(x)),
+      pubkeys: L[5],
+      signatures: L[6]
     })
   }
 }
@@ -121,6 +126,7 @@ class Header extends WireType {
   constructor (args) {
     super()
     this.prev = args.prev
+    this.prevTotalWork = args.prevTotalWork
     this.actroot = args.actroot
     this.miner = args.miner
     this.time = bn(args.time)
@@ -130,6 +136,7 @@ class Header extends WireType {
   listify () {
     return [
       this.prev,
+      this.prevTotalWork,
       this.actroot,
       this.miner,
       this.time.toBuffer(),
@@ -137,16 +144,16 @@ class Header extends WireType {
     ]
   }
 
-  static fromRLP(L) {
+  static fromRLP (L) {
     return new Header({
       prev: L[0],
-      actroot: L[1],
-      miner: L[2],
-      time: bn(L[3]),
-      work: L[4],
+      prevTotalWork: L[1],
+      actroot: L[2],
+      miner: L[3],
+      time: bn(L[4]),
+      work: L[5]
     })
   }
-
 }
 
 class Block extends WireType {
@@ -157,44 +164,26 @@ class Block extends WireType {
   }
 
   listify () {
-    console.log(this)
     return [
       this.header.listify(),
       this.actions.map((a) => a.listify())
     ]
   }
 
-  static fromRLP(L) {
+  static fromRLP (L) {
     return new Block({
       header: Header.fromRLP(L[0]),
-      actions: L[1].map((a)=>Action.fromRLP(a)),
+      actions: L[1].map((a) => Action.fromRLP(a))
     })
   }
-}
 
-// ValidationContext is defined implicitly by consensus validation rules.
-// It is defined here explicitly to help implementation authors.
-// Listify contains UTXO, but not past headers or transactions.
-class ValidationContext extends WireType {
-  constructor () {
-    this.header // for header in chain...
-    this.currentAction // for action in header...
-    this.currentInput // for input in action...
-    this.inputAction // validate (currentAction,currentInput,inputAction)
-
-    this.ADHT = {} // action DHT :: txHash -> tx
-    this.BDHT = {} // block DHT :: headerHash -> header
-    this.UTXO = {} // UTXO set :: (txHash,index) -> true | null
+  remerk () {
+    let txids = this.actions.map((a)=>a.hashID())
+    this.header.actroot = merkelize(txids)
   }
 
-  listify () {
-    return [
-      this.header.listify(), // wiretype
-      this.currentTx.listify(), // wiretype
-      this.currentOutputIndex, // varint
-      this.currentInputTx.listify(), // wiretype
-      this.UTXO.flatten() // serialized set, not a wiretype
-    ]
+  hashID () {
+    throw new Error("Don't hashID() a block; it is identified by header.hashID()")
   }
 }
 
@@ -204,6 +193,5 @@ module.exports = {
   Input,
   Action,
   Header,
-  Block,
-  ValidationContext
+  Block
 }

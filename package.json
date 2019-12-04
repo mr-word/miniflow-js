@@ -4,7 +4,7 @@
   "author": "Mr Word <noman.word@protonmail.com>",
   "license": "GPL-3.0",
   "scripts": {
-    "test": "mocha",
+    "test": "DEBUG=miniflow:* mocha",
     "fmt": "standard --fix"
   },
   "devDependencies": {
@@ -13,10 +13,14 @@
     "standard": "^14.3.1"
   },
   "dependencies": {
+    "array-buffer-to-hex": "^1.0.0",
     "blake2": "^4.0.0",
     "bn.js": "^5.0.0",
+    "debug": "^4.1.1",
     "eccrypto": "^1.1.2",
+    "immutable": "^4.0.0-rc.12",
     "libsodium": "^0.7.6",
-    "rlp": "^2.2.4"
+    "rlp": "^2.2.4",
+    "tweetnacl": "^1.0.1"
   }
 }

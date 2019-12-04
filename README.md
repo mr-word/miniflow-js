@@ -18,6 +18,7 @@ big and fast UTXO machine with tiny spec
 * libp2p for networking
 * blake2b for hashing
 * secp256k1 for signing (TODO: consider Ed25519)
+* immutable-js for hygiene
 
 ### agenda
 
