@@ -24,7 +24,7 @@ class State {
   }
 }
 
-class MultiState {
+class BlockTree {
   constructor (validator) {
     this.validator = validator
     this.allBlocks = new Map()
@@ -39,7 +39,7 @@ class MultiState {
 
   isUnspent(header, outTag) {
     let s = this.snapshots.get(ab2h(header))
-    if (!s) throw new Error(`no such header in multistate: ${ab2h(header)})`)
+    if (!s) throw new Error(`no such header in blocktree: ${ab2h(header)})`)
     return s.UTXO.has(outTag)
   }
 
@@ -55,7 +55,7 @@ class MultiState {
 
   insert (block) {
     debug(`state snapshots: %O`, this.snapshots)
-    debug(`inserting block into multistate: %O`, block)
+    debug(`inserting block into blocktree: %O`, block)
 
     this.allBlocks.set(ab2h(block.header.hashID()), block)
     block.actions.forEach((action) => {
@@ -63,7 +63,7 @@ class MultiState {
     })
 
     let state = this.checkout(h2ab(block.header.prev))
-    if (!state) throw new Error(`No such block.prev exists in the multistate`)
+    if (!state) throw new Error(`No such block.prev exists in the blocktree`)
     let stateAfter = this.validator.evaluate(state, block)
     this.snapshots.set(ab2h(block.header.hashID()), stateAfter)
     // determine latest
@@ -89,4 +89,4 @@ class MultiState {
   }
 }
 
-module.exports = { State, MultiState }
+module.exports = { State, BlockTree }
