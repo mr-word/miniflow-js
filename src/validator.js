@@ -15,7 +15,7 @@ class Validator {
 
   // returns (err, [addUTXO, useUTXO])
   evaluate (state, block) {
-    debug(`evaluate given state %O and block %O`, state, block)
+    debug('evaluate given state %O and block %O', state, block)
     const header = block.header
 
     const now = this.getTime()

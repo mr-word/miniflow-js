@@ -1,18 +1,20 @@
 const mini = require('../src/wiretypes.js')
 
+const ZERO = '0'.repeat(64)
+
 const action = new mini.Action({
-  confirmHeader: 0,
+  confirmHeader: ZERO,
   validSince: 0,
   validUntil: 0,
   pubkeys: [],
   signatures: [],
   inputs: [
     new mini.Input({
-      action: 0,
+      action: ZERO,
       index: 0
     }),
     new mini.Input({
-      action: 0,
+      action: ZERO,
       index: 1
     })
   ],
@@ -35,8 +37,8 @@ const action = new mini.Action({
 })
 
 const header = new mini.Header({
-  prev: 0,
-  actroot: 'remerk',
+  prev: ZERO,
+  actroot: ZERO,
   miner: 0,
   time: 0,
   work: 0

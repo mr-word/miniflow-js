@@ -3,7 +3,10 @@ const want = require('chai').expect
 const BN = require('bn.js')
 const bn = (n) => new BN(n)
 
-describe('mini wire types', () => {
+const ZERO = '0'.repeat(64)
+const FAKEHASH = '7'.repeat(64)
+
+describe('mini wiretypes', () => {
   it('output', () => {
     const output = new mini.Output({
       left: 0,
@@ -25,9 +28,8 @@ describe('mini wire types', () => {
       quorum: 2,
       pubkeyidx: Array([0, 1, 2])
     })
-    const fakeTrxHash = Buffer(32).fill(7)
     const input = new mini.Input({
-      action: fakeTrxHash,
+      action: FAKEHASH,
       index: 0
     })
     const encoded = input.serialize()
@@ -44,21 +46,20 @@ describe('mini wire types', () => {
       quorum: 2,
       pubkeyidx: Array([0, 1, 2])
     })
-    const fakeTrxHash = Buffer(32).fill(7)
     const input = new mini.Input({
-      action: fakeTrxHash,
+      action: FAKEHASH,
       index: 0
     })
     const action = new mini.Action({
-      confirmHeader: new Buffer('header'),
+      confirmHeader: ZERO,
       validSince: 0,
       validUntil: 0,
       inputs: [input],
       outputs: [output],
       pubkeys: [pubkeys],
-      extradata: new Buffer('DATA'),
       signatures: [new Buffer('sig1')]
     })
+    console.log(action.listify())
 
     const encoded = action.serialize()
     const decoded = mini.Action.fromBytes(encoded)
@@ -67,9 +68,9 @@ describe('mini wire types', () => {
 
   it('header', () => {
     const header = new mini.Header({
-      prev: Buffer('prev'),
+      prev: ZERO,
       prevTotalWork: Buffer('prevTotalWork'),
-      actroot: Buffer('root'),
+      actroot: ZERO,
       miner: Buffer('miner'),
       time: Buffer('time'),
       work: Buffer('work')
@@ -89,13 +90,12 @@ describe('mini wire types', () => {
       quorum: 2,
       pubkeyidx: [0, 1, 2]
     })
-    const fakeTrxHash = Buffer(32).fill(7)
     const input = new mini.Input({
-      action: fakeTrxHash,
+      action: FAKEHASH,
       index: 0
     })
     const action = new mini.Action({
-      confirmHeader: new Buffer('header'),
+      confirmHeader: ZERO,
       validSince: 0,
       validUntil: 0,
       inputs: [input],
@@ -105,9 +105,9 @@ describe('mini wire types', () => {
       signatures: [new Buffer('sig1')]
     })
     const header = new mini.Header({
-      prev: Buffer('prev'),
+      prev: ZERO,
       prevTotalWork: Buffer('prevTotalWork'),
-      actroot: Buffer('root'),
+      actroot: ZERO,
       miner: Buffer('miner'),
       time: Buffer('time'),
       work: Buffer('work')

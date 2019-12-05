@@ -12,14 +12,13 @@ describe('state', () => {
     bt = new BlockTree(v)
   })
   it('init with minibang', () => {
-    bt.init(bang)
+    bt.forceInsert(bang)
     s = bt.checkout(bang.header.hashID())
-    let HEADERHASH = Buffer(32).fill(7)
-    s.addUTXO(['txid','idx'])
+    const HEADERHASH = Buffer(32).fill(7)
+    s.addUTXO(['txid', 'idx'])
     s.pushHeader(HEADERHASH)
     bt.commit(HEADERHASH, s)
-    want(bt.isUnspent(HEADERHASH, ['txid','idx']), 'fresh txo not in utxo after commit')
+    want(bt.isUnspent(HEADERHASH, ['txid', 'idx']), 'fresh txo not in utxo after commit')
     want(bt.latest == HEADERHASH, 'pushed header not latest after commit')
   })
-
 })

@@ -10,12 +10,12 @@ describe('validator', () => {
   beforeEach(() => {
     v = new Validator()
     bt = new BlockTree(v)
-    p = new Producer(s, testkeypair)
+    p = new Producer(bt, testkeypair)
   })
   it('init with minibang', () => {
-    bt.init(bang)
+    bt.forceInsert(bang)
   })
   it('mine a block', () => {
-    bt.init(bang)
+    bt.forceInsert(bang)
   })
 })

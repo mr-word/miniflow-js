@@ -5,8 +5,13 @@ const { hash } = require('../src/crypto.js')
 
 const ZERO = new Buffer(32).fill(0)
 
+// operates on arraybuffers, not hex
 function merkelize (list) {
-  if (list.length == 0) return hash(ZERO)
+  if (list.length == 0) return ZERO
+  list = list.map((i) => Buffer(i))
+  if (typeof (list[0]) === 'string') {
+    throw new Error('merkelize operates directly on Buffers, not hex strings')
+  }
   let current = list
   let next = []
   while (true) {

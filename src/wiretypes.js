@@ -1,4 +1,6 @@
 const debug = require('debug')('miniflow')
+const h2ab = require('hex-to-array-buffer')
+const ab2h = require('array-buffer-to-hex')
 const rlp = require('rlp')
 const BN = require('bn.js')
 const bn = (n) => new BN(n)
@@ -16,7 +18,7 @@ class WireType {
   }
 
   hashID () {
-    return hash(this.serialize())
+    return ab2h(hash(this.serialize()))
   }
 
   serialize () {
@@ -48,8 +50,18 @@ class Output extends WireType {
     ]
   }
 
-  hashID() {
+  hashID () {
     throw new TypeError("Don't use hashID for outputs, use (txID,idx)")
+  }
+
+  static fromJSON (obj) {
+    return new Output({
+      left: bn(obj.left),
+      right: bn(obj.right),
+      data: obj.data,
+      quorum: obj.quorum,
+      pubkeyidx: obj.pubkeyidx
+    })
   }
 
   static fromRLP (L) {
@@ -72,14 +84,14 @@ class Input extends WireType {
 
   listify () {
     return [
-      this.actionHash,
+      Buffer(h2ab(this.actionHash)),
       this.outputIndex.toBuffer()
     ]
   }
 
   static fromRLP (L) {
     return new Input({
-      action: L[0],
+      action: ab2h(L[0]),
       index: bn(L[1])
     })
   }
@@ -99,7 +111,7 @@ class Action extends WireType {
 
   listify () {
     return [
-      this.confirmHeader,
+      Buffer(h2ab(this.confirmHeader)),
       this.validSince.toBuffer(),
       this.validUntil.toBuffer(),
       this.inputs.map((x) => x.listify()),
@@ -115,7 +127,7 @@ class Action extends WireType {
 
   static fromRLP (L) {
     return new Action({
-      confirmHeader: L[0],
+      confirmHeader: ab2h(L[0]),
       validSince: bn(L[1]),
       validUntil: bn(L[2]),
       inputs: L[3].map((x) => Input.fromRLP(x)),
@@ -139,9 +151,9 @@ class Header extends WireType {
 
   listify () {
     return [
-      this.prev,
+      Buffer(h2ab(this.prev)),
       this.prevTotalWork,
-      this.actroot,
+      Buffer(h2ab(this.actroot)),
       this.miner,
       this.time.toBuffer(),
       this.work
@@ -150,9 +162,9 @@ class Header extends WireType {
 
   static fromRLP (L) {
     return new Header({
-      prev: L[0],
+      prev: ab2h(L[0]),
       prevTotalWork: L[1],
-      actroot: L[2],
+      actroot: ab2h(L[2]),
       miner: L[3],
       time: bn(L[4]),
       work: L[5]
@@ -182,8 +194,9 @@ class Block extends WireType {
   }
 
   remerk () {
-    let txids = this.actions.map((a)=>a.hashID())
-    this.header.actroot = merkelize(txids)
+    const txids = this.actions.map((a) => h2ab(a.hashID()))
+    console.log(txids)
+    this.header.actroot = ab2h(merkelize(txids))
   }
 
   hashID () {
