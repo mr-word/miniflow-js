@@ -1,54 +1,37 @@
-const mini = require('../src/wiretypes.js')
+const data = require('../src/data.js')
+const BN = require('bn.js')
+const ab2h = require('array-buffer-to-hex')
 
 const ZERO = '0'.repeat(64)
+bn2hex = (bn) => ab2h(bn.toBuffer())
+n2hex = (n) => bn2hex(new BN(n))
 
-const action = new mini.Action({
-  confirmHeader: ZERO,
-  validSince: 0,
-  validUntil: 0,
-  pubkeys: [],
-  signatures: [],
-  inputs: [
-    new mini.Input({
-      action: ZERO,
-      index: 0
-    }),
-    new mini.Input({
-      action: ZERO,
-      index: 1
-    })
-  ],
-  outputs: [
-    new mini.Output({
-      left: 0,
-      right: 1,
-      data: 0,
-      quorum: 0,
-      pubkeyidx: []
-    }),
-    new mini.Output({
-      left: 1,
-      right: 255,
-      data: 0,
-      quorum: 0,
-      pubkeyidx: []
-    })
-  ]
-})
 
-const header = new mini.Header({
-  prev: ZERO,
-  actroot: ZERO,
-  miner: 0,
-  time: 0,
-  work: 0
-})
+const blk0act0 = {
+    confirmHeader: ZERO,
+    validSince: n2hex(0),
+    validUntil: n2hex(0),
+    signatures: [],
+    inputs: [],
+    outputs: [],
+    extraData: ZERO
+}
 
-const block = new mini.Block({
-  header: header,
-  actions: [action]
-})
+const hdr0 = {
+    prev: ZERO,
+    prevTotalWork: n2hex(0),
+    actroot: ZERO,
+    miner: ZERO,
+    time: n2hex(0),
+    work: ZERO
+} 
 
-block.remerk()
+const blk0 = {
+    header: hdr0,
+    actions: [blk0act0]
+}
 
-module.exports = block
+const block = data.Block.fromJSON(blk0);
+block.remerk();
+
+module.exports = block;
