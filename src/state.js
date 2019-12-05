@@ -6,54 +6,77 @@ const h2ab = require('hex-to-array-buffer')
 const ZERO = ab2h(new ArrayBuffer(32))
 
 class State {
-  constructor (head, headers, UTXO) {
+  constructor (tree, state, head) {
+    this._lock = false
+    this._back = tree
+    this.S = state
     this.head = head
-    this.headers = headers // set<header>
-    this.UTXO = UTXO // [txid,opidx] -> header
   }
 
-  // (txid,idx)
-  addUTXO (outTag) {
-    this.UTXO = this.UTXO.set(outTag, this.head)
+  assertUnlocked () {
+    if (this._lock) throw new Error('This state ref has already been commit')
   }
 
-  delUTXO (outTag) {
-    this.UTXO = this.UTXO.delete(outTag)
+  addUTXO (txid, idx) {
+    this.assertUnlocked()
+    this.S.set(['utxo', txid, idx], this.head)
+  }
+
+  delUTXO (txid, idx) {
+    this.assertUnlocked()
+    this.S.delete(['utxo', txid, idx], this.head)
+  }
+
+  addBlock (header, block) {
+    this.assertUnlocked()
+    this.S.set(['block', header], block)
   }
 
   pushHeader (header) {
-    this.headers = this.headers.add(header)
+    this.assertUnlocked()
+    this.S.set(['header', header], header)
     this.head = header
+  }
+
+  addAction (actID, action) {
+    this.assertUnlocked()
+    this.S.set(['action', actID], [this.head, action])
+  }
+
+  commit () {
+    this.assertUnlocked()
+    this._back.snapshots = this._back.snapshots.set(this.head, this)
+    return this.head
   }
 }
 
 class BlockTree {
   constructor (validator) {
+    // ['header', HEADER] -> bool
+    // ['utxo', acthash, idx] -> CONFHEADER
+    // ['block', HEADER] -> block
+    // ['action', acthash] -> CONFHEADER
+    this.multistate = immutable.Map()
+
     this.validator = validator
-    this.allBlocks = new Map()
-    this.allActions = new Map()
 
     // header -> State
     this.snapshots = immutable.Map()
-    const state0 = new State(ZERO, immutable.Set(), immutable.Map())
-    this.snapshots = this.snapshots.set(ZERO, state0)
-    this.latest = ZERO
+    const state0 = new State(this, this.multistate, ZERO)
+    state0.pushHeader(ZERO)
+    this.latest = state0.commit()
   }
 
-  isUnspent (header, outTag) {
+  isUnspent (header, actID, idx) {
     const s = this.snapshots.get(header)
     if (!s) throw new Error(`no such header in blocktree: ${header})`)
-    return s.UTXO.has(outTag)
+    return this.multistate.has(['utxo', actID, idx])
   }
 
   checkout (header) {
     debug('checking out header', header)
     debug('  checkout out from snapshot map %O', this.snapshots)
     return this.snapshots.get(header)
-  }
-
-  commit (header, state) {
-    this.snapshots = this.snapshots.set(header, state)
   }
 
   insert (block) {
@@ -70,25 +93,25 @@ class BlockTree {
     const stateAfter = this.validator.evaluate(state, block)
     this.snapshots.set(block.header.hashID(), stateAfter)
     // determine latest
-    return this.latest = stateAfter
+    // return this.latest = stateAfter
+    return stateAfter
   }
 
-  forceInsert (block, prev = 'latest') {
+  forceInsert (block, afterHeader) {
     debug('forceInsert block into blocktree: %O', block)
-    prev = prev === 'latest' ? this.latest : prev
-    debug('prev header: %s', prev)
-    const state = this.checkout(prev)
+    debug('afterHeader : %s', afterHeader)
+    const state = this.checkout(afterHeader)
     const HEADER = block.header.hashID()
-    this.allBlocks.set(HEADER, block)
+    state.addBlock(HEADER, block)
     state.pushHeader(HEADER)
     block.actions.forEach((action) => {
-      this.allActions.set(action.hashID(), action)
+      state.addAction(action.hashID(), action)
       action.outputs.forEach((output, idx) => {
-        state.addUTXO(action.getOutputTag(idx))
+        state.addUTXO(action.hashID(), idx)
       })
     })
-    this.commit(HEADER, state)
-    if (prev == this.latest) {
+    state.commit()
+    if (afterHeader == this.latest) { // TODO no, check work
       this.latest == HEADER
     }
   }

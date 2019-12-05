@@ -103,9 +103,10 @@ class Input extends MiniData {
 }
 
 class Action extends MiniData {
-  hashID() {
+  hashID () {
     return ab2h(hash(this.toBytes()))
   }
+
   toJSON () {
     return {
       confirmHeader: ab2h(this.confirmHeader),
@@ -158,9 +159,10 @@ class Action extends MiniData {
 }
 
 class Header extends MiniData {
-  hashID() {
+  hashID () {
     return ab2h(hash(this.toBytes()))
   }
+
   toJSON () {
     return {
       prev: ab2h(this.prev),
@@ -209,10 +211,11 @@ class Header extends MiniData {
 }
 
 class Block extends MiniData {
-  remerk() {
-    let actIDs = this.actions.map((a) => h2ab(a.hashID()))
+  remerk () {
+    const actIDs = this.actions.map((a) => h2ab(a.hashID()))
     this.header.actroot = merkelize(actIDs)
   }
+
   toJSON () {
     return {
       header: this.header.toJSON(),
