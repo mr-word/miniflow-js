@@ -8,9 +8,12 @@ big and fast UTXO machine with tiny spec
 * [double-life fee](https://word.site/2019/12/03/double-life-fee/) for simple state rent: UTXO expire when they are at least half as old as the chain itself
 * [dpow](https://word.site/2019/11/12/dynamic-pow/) - no difficulty/TBT - thin client header chain not throttled. Each block must be at least 1/2 as difficult as last block.
 * special case of [manaflow](https://word.site/2019/11/26/manaflow/) which interprets output data as code -- can be log-time validated if local eval context is appropriately limited and global writes go to special reducer
+* miniflow has no MPT or post-validation reduction
 * architecture could be easily adopted for UTXO systems with finite 'standard transaction' types
 * * alloced/garbage regions are the only UTXO logic in miniflow
-* * * Nevertheless, this is a minimal demonstration of threading consensus-validated state through UTXO
+* * * Nevertheless, this is a minimal demonstration of threading consensus-validated state through UTXO, specifically *without maintaining an auxiliary state DB*
+* headers DO NOT store block height. If your implementation indexes by block height for core validation, you are probably taking the wrong approach and may encouter difficulties handling the high-frequency reorgs that will happen at the head of the chain
+* headers DO store cumulative work which gives lets the light client have a parallel fail-fast
 
 ### key dependencies
 

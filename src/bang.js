@@ -6,14 +6,41 @@ const ZERO = '0'.repeat(64)
 bn2hex = (bn) => ab2h(bn.toBuffer())
 n2hex = (n) => bn2hex(new BN(n))
 
+const in0 = {
+  action: '',
+  index: 0
+}
+
+const out0 = {
+  left: 0,
+  right: 0,
+  data: '',
+  quorum: 0,
+  pubkeys: []
+}
+const out1 = {
+  left: 0,
+  right: 1,
+  data: '',
+  quorum: 0,
+  pubkeys: []
+}
+const out2 = {
+  left: 1,
+  right: 7,
+  data: '',
+  quorum: 0,
+  pubkeys: []
+}
+
+
 const blk0act0 = {
-  confirmHeader: ZERO,
   validSince: n2hex(0),
   validUntil: n2hex(0),
   signatures: [],
-  inputs: [],
-  outputs: [],
-  extraData: ZERO
+  inputs: [in0],
+  outputs: [out0, out1, out2],
+  extraData: ''
 }
 
 const hdr0 = {

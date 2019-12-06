@@ -70,16 +70,14 @@ class Input extends MiniData {
   toJSON () {
     return {
       action: ab2h(this.action),
-      index: ab2h(this.index.toBuffer()),
-      keyMask: ab2h(this.keyMask.toBuffer())
+      index: ab2h(this.index.toBuffer())
     }
   }
 
   listify () {
     return [
       Buffer(this.action),
-      this.index.toBuffer(),
-      this.keyMask.toBuffer()
+      this.index.toBuffer()
     ]
   }
 
@@ -88,7 +86,6 @@ class Input extends MiniData {
     const input = new Input()
     input.action = h2ab(obj.action),
     input.index = new BN(obj.index)
-    input.keyMask = new BN(obj.index)
     return input
   }
 
@@ -96,8 +93,7 @@ class Input extends MiniData {
     debug('Input.fromNestedList %O', list)
     return this.fromJSON({
       action: ab2h(list[0]),
-      index: new BN(list[1]),
-      keyMask: new BN(list[2])
+      index: new BN(list[1])
     })
   }
 }
@@ -109,7 +105,6 @@ class Action extends MiniData {
 
   toJSON () {
     return {
-      confirmHeader: ab2h(this.confirmHeader),
       validSince: ab2h(this.validSince.toBuffer()),
       validUntil: ab2h(this.validUntil.toBuffer()),
       inputs: this.inputs.map((i) => i.toJSON()),
@@ -121,7 +116,6 @@ class Action extends MiniData {
 
   listify () {
     return [
-      Buffer(this.confirmHeader),
       this.validSince.toBuffer(),
       this.validUntil.toBuffer(),
       this.inputs.map((i) => i.listify()),
@@ -134,7 +128,6 @@ class Action extends MiniData {
   static fromJSON (obj) {
     debug('Action.fromJSON %O', obj)
     const action = new Action()
-    action.confirmHeader = h2ab(obj.confirmHeader)
     action.validSince = new BN(obj.validSince)
     action.validUntil = new BN(obj.validUntil)
     action.inputs = obj.inputs.map((i) => Input.fromJSON(i))
@@ -147,13 +140,12 @@ class Action extends MiniData {
   static fromNestedList (list) {
     debug('Action.fromNestedList %O', list)
     return this.fromJSON({
-      confirmHeader: ab2h(list[0]),
-      validSince: new BN(list[1]),
-      validUntil: new BN(list[2]),
-      inputs: list[3].map((i) => Input.fromNestedList(i).toJSON()),
-      outputs: list[4].map((o) => Output.fromNestedList(o).toJSON()),
-      signatures: list[5].map(ab2h),
-      extraData: ab2h(list[6])
+      validSince: new BN(list[0]),
+      validUntil: new BN(list[1]),
+      inputs: list[2].map((i) => Input.fromNestedList(i).toJSON()),
+      outputs: list[3].map((o) => Output.fromNestedList(o).toJSON()),
+      signatures: list[4].map(ab2h),
+      extraData: ab2h(list[5])
     })
   }
 }
@@ -247,4 +239,4 @@ class Block extends MiniData {
   }
 }
 
-module.exports = { Output, Input, Action, Header, Block }
+module.exports = { Input, Output, Action, Header, Block }
