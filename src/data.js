@@ -8,21 +8,57 @@ const { merkelize } = require('../src/merkle.js')
 
 class MiniData {
   static fromBytes (bytes) {
-    return this.fromNestedList(rlp.decode(bytes))
+    return this.fromPreRLP(rlp.decode(bytes))
   }
 
-  static fromNestedList (list) {
-    throw new Error('tried to instantiate (fromBytes/fromNestedList) abstract class MiniData')
+  static fromPreRLP (list) {
+    throw new Error('tried to instantiate (fromBytes/fromPreRLP) abstract class MiniData')
   }
 
   toBytes () {
-    return rlp.encode(this.listify())
+    return rlp.encode(this.toPreRLP())
   }
 
-  listify () {
+  toPreRLP () {
     throw new Error('tried to toRLP abstract class MiniData')
   }
 }
+
+// UTXO tag
+// [actID,idx]
+class UTag extends MiniData {
+  toJSON () {
+    return {
+      action: ab2h(this.action),
+      index: ab2h(this.index.toBuffer())
+    }
+  }
+
+  toPreRLP () {
+    return [
+      Buffer(this.action),
+      this.index.toBuffer()
+    ]
+  }
+
+  static fromJSON (obj) {
+    debug('UTag.fromJSON %O', obj)
+    const input = new Input()
+    input.action = h2ab(obj.action),
+    input.index = new BN(obj.index)
+    return input
+  }
+
+  static fromPreRLP (list) {
+    debug('UTag.fromPreRLP %O', list)
+    return this.fromJSON({
+      action: ab2h(list[0]),
+      index: new BN(list[1])
+    })
+  }
+}
+
+class Input extends UTag {}
 
 class Output extends MiniData {
   toJSON () {
@@ -33,13 +69,13 @@ class Output extends MiniData {
       lockQuorum: ab2h(this.lockQuorum.toBuffer()),
       needQuorum: ab2h(this.needQuorum.toBuffer()),
       keyQuorum: ab2h(this.keyQuorum.toBuffer()),
-      locks: this.locks.map(ab2h),
-      needs: this.needs.map(ab2h),
+      locks: this.locks.map((utag)=>utag.toJSON()),
+      needs: this.needs.map((utag)=>utag.toJSON()),
       pubkeys: this.pubkeys.map(ab2h)
     }
   }
 
-  listify () {
+  toPreRLP () {
     return [
       this.left.toBuffer(),
       this.right.toBuffer(),
@@ -47,8 +83,8 @@ class Output extends MiniData {
       this.lockQuorum.toBuffer(),
       this.needQuorum.toBuffer(),
       this.keyQuorum.toBuffer(),
-      this.locks.map((x) => Buffer(x)),
-      this.needs.map((x) => Buffer(x)),
+      this.locks.map((utag)=>utag.toPreRLP()),
+      this.needs.map((utag)=>utag.toPreRLP()),
       this.pubkeys.map((x) => Buffer(x))
     ]
   }
@@ -61,13 +97,13 @@ class Output extends MiniData {
     output.lockQuorum = new BN(obj.lockQuorum)
     output.needQuorum = new BN(obj.needQuorum)
     output.keyQuorum = new BN(obj.keyQuorum)
-    output.locks = obj.locks.map(h2ab)
-    output.needs = obj.needs.map(h2ab)
+    output.locks = obj.locks.map((utag)=>UTag.fromJSON(utag))
+    output.needs = obj.needs.map((utag)=>UTag.fromJSON(utag))
     output.pubkeys = obj.pubkeys.map(h2ab)
     return output
   }
 
-  static fromNestedList (list) {
+  static fromPreRLP (list) {
     return this.fromJSON({
       left: new BN(list[0]),
       right: new BN(list[1]),
@@ -75,41 +111,9 @@ class Output extends MiniData {
       lockQuorum: new BN(list[3]),
       needQuorum: new BN(list[4]),
       keyQuorum: new BN(list[5]),
-      locks: list[6].map(ab2h),
-      needs: list[7].map(ab2h),
+      locks: list[6].map((utag)=>UTag.fromPreRLP(utag).toJSON()),
+      needs: list[7].map((utag)=>UTag.fromPreRLP(utag).toJSON()),
       pubkeys: list[8].map(ab2h)
-    })
-  }
-}
-
-class Input extends MiniData {
-  toJSON () {
-    return {
-      action: ab2h(this.action),
-      index: ab2h(this.index.toBuffer())
-    }
-  }
-
-  listify () {
-    return [
-      Buffer(this.action),
-      this.index.toBuffer()
-    ]
-  }
-
-  static fromJSON (obj) {
-    debug('Input.fromJSON %O', obj)
-    const input = new Input()
-    input.action = h2ab(obj.action),
-    input.index = new BN(obj.index)
-    return input
-  }
-
-  static fromNestedList (list) {
-    debug('Input.fromNestedList %O', list)
-    return this.fromJSON({
-      action: ab2h(list[0]),
-      index: new BN(list[1])
     })
   }
 }
@@ -131,12 +135,12 @@ class Action extends MiniData {
     }
   }
 
-  listify () {
+  toPreRLP () {
     return [
       this.validSince.toBuffer(),
       this.validUntil.toBuffer(),
-      this.inputs.map((i) => i.listify()),
-      this.outputs.map((o) => o.listify()),
+      this.inputs.map((i) => i.toPreRLP()),
+      this.outputs.map((o) => o.toPreRLP()),
       Buffer(this.confirmHeader),
       this.signatures.map((s) => Buffer(s)),
       Buffer(this.extraData)
@@ -156,13 +160,13 @@ class Action extends MiniData {
     return action
   }
 
-  static fromNestedList (list) {
-    debug('Action.fromNestedList %O', list)
+  static fromPreRLP (list) {
+    debug('Action.fromPreRLP %O', list)
     return this.fromJSON({
       validSince: new BN(list[0]),
       validUntil: new BN(list[1]),
-      inputs: list[2].map((i) => Input.fromNestedList(i).toJSON()),
-      outputs: list[3].map((o) => Output.fromNestedList(o).toJSON()),
+      inputs: list[2].map((i) => Input.fromPreRLP(i).toJSON()),
+      outputs: list[3].map((o) => Output.fromPreRLP(o).toJSON()),
       confirmHeader: ab2h(list[4]),
       signatures: list[5].map(ab2h),
       extraData: ab2h(list[6])
@@ -175,6 +179,12 @@ class Header extends MiniData {
     return ab2h(hash(this.toBytes()))
   }
 
+  mixHash() {
+    return ab2h(hash(Buffer(h2ab(
+        ab2h(this.prev) + ab2h(this.prevTotalWork.toBuffer())
+    ))))
+  }
+
   toJSON () {
     return {
       prev: ab2h(this.prev),
@@ -182,17 +192,19 @@ class Header extends MiniData {
       actroot: ab2h(this.actroot),
       miner: ab2h(this.miner),
       time: ab2h(this.time.toBuffer()),
+      fuzz: ab2h(this.fuzz),
       work: ab2h(this.work)
     }
   }
 
-  listify () {
+  toPreRLP () {
     return [
       Buffer(this.prev),
       this.prevTotalWork.toBuffer(),
       Buffer(this.actroot),
       Buffer(this.miner),
       this.time.toBuffer(),
+      Buffer(this.fuzz),
       Buffer(this.work)
     ]
   }
@@ -205,19 +217,21 @@ class Header extends MiniData {
     header.actroot = h2ab(obj.actroot)
     header.miner = h2ab(obj.miner)
     header.time = new BN(obj.time)
+    header.fuzz = h2ab(obj.fuzz)
     header.work = h2ab(obj.work)
     return header
   }
 
-  static fromNestedList (list) {
-    debug('Header.fromNestedList %O', list)
+  static fromPreRLP (list) {
+    debug('Header.fromPreRLP %O', list)
     return this.fromJSON({
       prev: ab2h(list[0]),
       prevTotalWork: new BN(list[1]),
       actroot: ab2h(list[2]),
       miner: ab2h(list[3]),
       time: new BN(list[4]),
-      work: ab2h(list[5])
+      fuzz: ab2h(list[5]),
+      work: ab2h(list[6])
     })
   }
 }
@@ -236,10 +250,10 @@ class Block extends MiniData {
     }
   }
 
-  listify () {
+  toPreRLP () {
     return [
-      this.header.listify(),
-      this.actions.map((a) => a.listify())
+      this.header.toPreRLP(),
+      this.actions.map((a) => a.toPreRLP())
     ]
   }
 
@@ -251,11 +265,11 @@ class Block extends MiniData {
     return block
   }
 
-  static fromNestedList (list) {
-    debug('Block.fromNestedList %O', list)
+  static fromPreRLP (list) {
+    debug('Block.fromPreRLP %O', list)
     return this.fromJSON({
-      header: Header.fromNestedList(list[0]).toJSON(),
-      actions: list[1].map((a) => Action.fromNestedList(a).toJSON())
+      header: Header.fromPreRLP(list[0]).toJSON(),
+      actions: list[1].map((a) => Action.fromPreRLP(a).toJSON())
     })
   }
 }

@@ -11,6 +11,7 @@ const block1 = Block.fromJSON({
         actroot: '', // .remerk()
         miner: ab2h(Buffer(keypair.publicKey)),
         time: Date.now(),
+        fuzz: '',
         work: '' // .work()
     },
     actions: [{

@@ -17,17 +17,26 @@ class Validator {
   }
 
   // returns state ref or throw error
-  evaluate (state, block) {
+  evaluate (state, block, headerOnly = false) {
     debug('evaluate given state %O and block %O', state, block)
 
     // Header conditions
+    // prev, prevTotalWork, (actroot), miner, time, work
     const header = block.header
     const now = this.getTime()
     need(header.time <= now, `header.time (${header.time}) cannot be in the future (after ${now})`)
+    need(state.hasHeader(ab2h(header.prev)), 'evaluate given a state, but it does not contain block.prev')
     // assert work > latest.work / 2
     // assert block.prevTotalWork = latest.prevTotalWork + latest.work
-    need(state.hasHeader(ab2h(header.prev)), 'evaluate given a state, but it does not contain block.prev')
+    // miner field: no check
+
+    // actroot at end of block (or during)
+
     state.addHeader(header)
+
+    if (headerOnly) {
+        return state
+    }
 
     // Actions
     const actions = block.actions

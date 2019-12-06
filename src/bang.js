@@ -61,6 +61,7 @@ const hdr0 = {
   actroot: ZERO,
   miner: ZERO,
   time: n2hex(0),
+  fuzz: ZERO,
   work: ZERO
 }
 
