@@ -109,6 +109,8 @@ class Action extends MiniData {
       validUntil: ab2h(this.validUntil.toBuffer()),
       inputs: this.inputs.map((i) => i.toJSON()),
       outputs: this.outputs.map((o) => o.toJSON()),
+      confirmHeader: ab2h(this.confirmHeader),
+      locks: this.locks.map(ab2h),
       signatures: this.signatures.map(ab2h),
       extraData: ab2h(this.extraData)
     }
@@ -120,6 +122,8 @@ class Action extends MiniData {
       this.validUntil.toBuffer(),
       this.inputs.map((i) => i.listify()),
       this.outputs.map((o) => o.listify()),
+      Buffer(this.confirmHeader),
+      this.locks.map((l) => Buffer(l)),
       this.signatures.map((s) => Buffer(s)),
       Buffer(this.extraData)
     ]
@@ -132,6 +136,8 @@ class Action extends MiniData {
     action.validUntil = new BN(obj.validUntil)
     action.inputs = obj.inputs.map((i) => Input.fromJSON(i))
     action.outputs = obj.outputs.map((o) => Output.fromJSON(o))
+    action.confirmHeader = h2ab(obj.confirmHeader)
+    action.locks = obj.locks.map(h2ab)
     action.signatures = obj.signatures.map(h2ab)
     action.extraData = h2ab(obj.extraData)
     return action
@@ -144,8 +150,10 @@ class Action extends MiniData {
       validUntil: new BN(list[1]),
       inputs: list[2].map((i) => Input.fromNestedList(i).toJSON()),
       outputs: list[3].map((o) => Output.fromNestedList(o).toJSON()),
-      signatures: list[4].map(ab2h),
-      extraData: ab2h(list[5])
+      confirmHeader: ab2h(list[4]),
+      locks: list[5].map(ab2h),
+      signatures: list[6].map(ab2h),
+      extraData: ab2h(list[7])
     })
   }
 }

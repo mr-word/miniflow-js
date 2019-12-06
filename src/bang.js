@@ -33,13 +33,14 @@ const out2 = {
   pubkeys: []
 }
 
-
 const blk0act0 = {
   validSince: n2hex(0),
   validUntil: n2hex(0),
-  signatures: [],
   inputs: [in0],
   outputs: [out0, out1, out2],
+  confirmHeader: '',
+  locks: [],
+  signatures: [],
   extraData: ''
 }
 

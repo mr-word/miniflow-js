@@ -12,6 +12,7 @@ big and fast UTXO machine with tiny spec
 * architecture could be easily adopted for UTXO systems with finite 'standard transaction' types
 * * alloced/garbage regions are the only UTXO logic in miniflow
 * * * Nevertheless, this is a minimal demonstration of threading consensus-validated state through UTXO, specifically *without maintaining an auxiliary state DB*
+* UTXO 'locks' are implemented with 'NTXI' reducer similar to RTXI. Still does not require auxiliary state DB, just more fields in chonk reducer.
 * headers DO NOT store block height. If your implementation indexes by block height for core validation, you are probably taking the wrong approach and may encouter difficulties handling the high-frequency reorgs that will happen at the head of the chain
 * headers DO store cumulative work which gives lets the light client have a parallel fail-fast
 

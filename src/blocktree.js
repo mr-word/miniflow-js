@@ -56,7 +56,7 @@ class BlockTree {
     return S.has(L(['utxo', txid, idx]))
   }
 
-  hasHeader(header, inBranch) {
+  hasHeader (header, inBranch) {
     if (!this.locked) throw new Error('you must checkout a state to read hasHeader')
     let S
     if (inBranch === undefined) {
@@ -105,14 +105,14 @@ class BlockTree {
 
   insertBlock (block) {
     debug('insertBlock into blocktree: %O', block)
-    if(this.locked) throw new Error(`cannot insertBlock into a locked blocktree`)
+    if (this.locked) throw new Error('cannot insertBlock into a locked blocktree')
 
     const prevHeader = ab2h(block.header.prev)
     if (!this.refs.has(prevHeader)) {
       throw new Error(`trying to applyBlock but no known state for prevHeader ${prevHeader}`)
     }
     this.checkout(prevHeader)
-    
+
     this.addHeader(block.header)
     this.addBlock(block)
     block.actions.forEach((action) => {
@@ -123,7 +123,7 @@ class BlockTree {
       })
       action.inputs.forEach((input) => {
         debug('deleting utxo given in input %O from action %O', input, action)
-        let ACTION = ab2h(input.action)
+        const ACTION = ab2h(input.action)
         if (ACTION != '') {
           this.delUTXO(ACTION, input.index.toNumber()) // TODO value types
         } else {
@@ -131,7 +131,7 @@ class BlockTree {
         }
       })
     })
-    
+
     this.commit(block.header.hashID())
   }
 }

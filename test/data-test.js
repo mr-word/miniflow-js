@@ -3,6 +3,8 @@ const want = require('chai').expect
 const ab2h = require('array-buffer-to-hex')
 const BN = require('bn.js')
 
+const debug = require('debug')('miniflow:tests')
+
 bn2hex = (bn) => ab2h(bn.toBuffer())
 n2hex = (n) => bn2hex(new BN(n))
 
@@ -24,8 +26,10 @@ const actionJSON = {
   validUntil: n2hex(1),
   inputs: [inputJSON],
   outputs: [outputJSON],
-  signatures: ['b0bcad'],
-  extraData: 'ff' // NOT SIGNED - inserted/replaced by block producer
+  confirmHeader: '00',
+  locks: ['10c5', '10c6'],
+  signatures: ['b0bd55', 'cadf55'],
+  extraData: 'e5dada' // NOT SIGNED - inserted/replaced by block producer
 }
 
 const headerJSON = {
@@ -80,5 +84,24 @@ describe('datatypes', () => {
     const decoded = data.Block.fromBytes(bytes)
     want(block.toJSON()).deep.equal(blockJSON)
     want(decoded.toJSON()).deep.equal(block.toJSON())
+  })
+})
+
+describe('buffers etc', () => {
+  it('bignum serialized form (no varint)', () => {
+    want((new BN(0)).toBuffer()).deep.equal(Buffer.from([0]))
+    want((new BN(255)).toBuffer()).deep.equal(Buffer.from([255]))
+    want((new BN(256)).toBuffer()).deep.equal(Buffer.from([1, 0]))
+    const nums = [
+      new BN(0),
+      new BN(1),
+      new BN(256),
+      ((new BN(2)).pow(new BN(256))).sub(new BN(1)),
+      (new BN(2)).pow(new BN(256))
+    ]
+    debug('%O', nums.map((n) => n.toArray()))
+    let n255s = (new Buffer(32)).fill(255)
+    let bn256m1 = (((new BN(2)).pow(new BN(256))).sub(new BN(1))).toArray()
+    want(ab2h(n255s)).equal(ab2h(Buffer(bn256m1)))
   })
 })
