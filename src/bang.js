@@ -15,21 +15,33 @@ const out0 = {
   left: 0,
   right: 0,
   data: '',
-  quorum: 0,
+  lockQuorum: 0,
+  needQuorum: 0,
+  keyQuorum: 0,
+  locks: [],
+  needs: [],
   pubkeys: []
 }
 const out1 = {
   left: 0,
   right: 1,
   data: '',
-  quorum: 0,
+  lockQuorum: 0,
+  needQuorum: 0,
+  keyQuorum: 0,
+  locks: [],
+  needs: [],
   pubkeys: []
 }
 const out2 = {
   left: 1,
   right: 7,
   data: '',
-  quorum: 0,
+  lockQuorum: 0,
+  needQuorum: 0,
+  keyQuorum: 0,
+  locks: [],
+  needs: [],
   pubkeys: []
 }
 
@@ -39,7 +51,6 @@ const blk0act0 = {
   inputs: [in0],
   outputs: [out0, out1, out2],
   confirmHeader: '',
-  locks: [],
   signatures: [],
   extraData: ''
 }

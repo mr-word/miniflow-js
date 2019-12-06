@@ -30,7 +30,11 @@ class Output extends MiniData {
       left: ab2h(this.left.toBuffer()),
       right: ab2h(this.right.toBuffer()),
       data: ab2h(this.data),
-      quorum: ab2h(this.quorum.toBuffer()),
+      lockQuorum: ab2h(this.lockQuorum.toBuffer()),
+      needQuorum: ab2h(this.needQuorum.toBuffer()),
+      keyQuorum: ab2h(this.keyQuorum.toBuffer()),
+      locks: this.locks.map(ab2h),
+      needs: this.needs.map(ab2h),
       pubkeys: this.pubkeys.map(ab2h)
     }
   }
@@ -40,7 +44,11 @@ class Output extends MiniData {
       this.left.toBuffer(),
       this.right.toBuffer(),
       Buffer(this.data),
-      this.quorum.toBuffer(),
+      this.lockQuorum.toBuffer(),
+      this.needQuorum.toBuffer(),
+      this.keyQuorum.toBuffer(),
+      this.locks.map((x) => Buffer(x)),
+      this.needs.map((x) => Buffer(x)),
       this.pubkeys.map((x) => Buffer(x))
     ]
   }
@@ -50,7 +58,11 @@ class Output extends MiniData {
     output.left = new BN(obj.left)
     output.right = new BN(obj.right)
     output.data = h2ab(obj.data)
-    output.quorum = new BN(obj.quorum)
+    output.lockQuorum = new BN(obj.lockQuorum)
+    output.needQuorum = new BN(obj.needQuorum)
+    output.keyQuorum = new BN(obj.keyQuorum)
+    output.locks = obj.locks.map(h2ab)
+    output.needs = obj.needs.map(h2ab)
     output.pubkeys = obj.pubkeys.map(h2ab)
     return output
   }
@@ -60,8 +72,12 @@ class Output extends MiniData {
       left: new BN(list[0]),
       right: new BN(list[1]),
       data: ab2h(list[2]),
-      quorum: new BN(list[3]),
-      pubkeys: list[4].map(ab2h)
+      lockQuorum: new BN(list[3]),
+      needQuorum: new BN(list[4]),
+      keyQuorum: new BN(list[5]),
+      locks: list[6].map(ab2h),
+      needs: list[7].map(ab2h),
+      pubkeys: list[8].map(ab2h)
     })
   }
 }
@@ -110,7 +126,6 @@ class Action extends MiniData {
       inputs: this.inputs.map((i) => i.toJSON()),
       outputs: this.outputs.map((o) => o.toJSON()),
       confirmHeader: ab2h(this.confirmHeader),
-      locks: this.locks.map(ab2h),
       signatures: this.signatures.map(ab2h),
       extraData: ab2h(this.extraData)
     }
@@ -123,7 +138,6 @@ class Action extends MiniData {
       this.inputs.map((i) => i.listify()),
       this.outputs.map((o) => o.listify()),
       Buffer(this.confirmHeader),
-      this.locks.map((l) => Buffer(l)),
       this.signatures.map((s) => Buffer(s)),
       Buffer(this.extraData)
     ]
@@ -137,7 +151,6 @@ class Action extends MiniData {
     action.inputs = obj.inputs.map((i) => Input.fromJSON(i))
     action.outputs = obj.outputs.map((o) => Output.fromJSON(o))
     action.confirmHeader = h2ab(obj.confirmHeader)
-    action.locks = obj.locks.map(h2ab)
     action.signatures = obj.signatures.map(h2ab)
     action.extraData = h2ab(obj.extraData)
     return action
@@ -151,9 +164,8 @@ class Action extends MiniData {
       inputs: list[2].map((i) => Input.fromNestedList(i).toJSON()),
       outputs: list[3].map((o) => Output.fromNestedList(o).toJSON()),
       confirmHeader: ab2h(list[4]),
-      locks: list[5].map(ab2h),
-      signatures: list[6].map(ab2h),
-      extraData: ab2h(list[7])
+      signatures: list[5].map(ab2h),
+      extraData: ab2h(list[6])
     })
   }
 }

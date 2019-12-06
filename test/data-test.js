@@ -12,8 +12,12 @@ const outputJSON = {
   left: n2hex(0),
   right: n2hex(1),
   data: 'daba',
-  quorum: n2hex(2),
-  pubkeys: ['aaaa', 'bbbb', 'cccc']
+  lockQuorum: n2hex(0),
+  needQuorum: n2hex(0),
+  keyQuorum: n2hex(2),
+  locks: [],
+  needs: [],
+  pubkeys: []
 }
 
 const inputJSON = {
@@ -27,7 +31,6 @@ const actionJSON = {
   inputs: [inputJSON],
   outputs: [outputJSON],
   confirmHeader: '00',
-  locks: ['10c5', '10c6'],
   signatures: ['b0bd55', 'cadf55'],
   extraData: 'e5dada' // NOT SIGNED - inserted/replaced by block producer
 }
