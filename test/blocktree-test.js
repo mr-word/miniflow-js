@@ -15,37 +15,38 @@ describe('blocktree', () => {
     bt = new BlockTree()
   })
   it('basics', () => {
-    bt.checkout(ZERO)
-    bt.addHeader(bang.header)
-    bt.addUTXO('TXID', 0)
-    bt.addUTXO('TXID', 1)
-    bt.delUTXO('TXID', 1)
-    bt.commit(BANG)
+    let s = bt.checkout(ZERO)
+    s.addHeader(bang.header)
+    s.addUTXO('TXID', 0)
+    s.addUTXO('TXID', 1)
+    s.delUTXO('TXID', 1)
+    bt.commit(BANG, s)
 
-    bt.checkout(BANG)
-    want(bt.isUnspent('TXID', 0)).true
-    want(bt.isUnspent('TXID', 0)).true
-    want(bt.isUnspent('TXID', 1)).false
-    bt.close()
+    s = bt.checkout(BANG)
+    want(s.isUnspent('TXID', 0)).true
+    want(s.isUnspent('TXID', 0)).true
+    want(s.isUnspent('TXID', 1)).false
 
-    bt.checkout(BANG)
-    bt.delUTXO('TXID', 0)
-    bt.commit('1'.repeat(64))
+    s.delUTXO('TXID', 0)
+    bt.commit('1'.repeat(64), s)
 
-    bt.checkout('1'.repeat(64))
-    want(bt.isUnspent('TXID', 0)).false
-    want(bt.isUnspent('TXID', 1)).false
+    s = bt.checkout('1'.repeat(64))
+    want(s.isUnspent('TXID', 0)).false
+    want(s.isUnspent('TXID', 1)).false
 
-    want(bt.isUnspent('TXID', 0, BANG)).true
-    want(bt.isUnspent('TXID', 1, BANG)).false
+    s = bt.checkout(BANG)
+    want(s.isUnspent('TXID', 0, BANG)).true
+    want(s.isUnspent('TXID', 1, BANG)).false
   })
 
   it('insertBlock', () => {
-    const s1 = bt.insertBlock(bang)
+    const s0 = bt.checkout(ZERO)
+    s0.insertBlock(bang)
+    bt.commit(BANG, s0)
 
-    bt.checkout(BANG)
-    want(bt.hasHeader(BANG)).true
-    want(bt.isUnspent(bang.actions[0].hashID(), 0)).false
-    want(bt.isUnspent(bang.actions[0].hashID(), 1)).true
+    const s1 = bt.checkout(BANG)
+    want(s1.hasHeader(BANG)).true
+    want(s1.isUnspent(bang.actions[0].hashID(), 0)).false
+    want(s1.isUnspent(bang.actions[0].hashID(), 1)).true
   })
 })

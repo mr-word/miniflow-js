@@ -1,6 +1,9 @@
 const debug = require('debug')('miniflow:validator')
 const immutable = require('immutable')
-const { State } = require('../src/state.js')
+const { BlockTree } = require('../src/blocktree.js')
+const ab2h = require('array-buffer-to-hex')
+const h2ab = require('hex-to-array-buffer')
+
 
 class ValidationError extends Error {}
 
@@ -13,22 +16,20 @@ class Validator {
     this.getTime = () => Date.now()
   }
 
-  // returns (err, [addUTXO, useUTXO])
+  // returns state ref or throw error
   evaluate (state, block) {
     debug('evaluate given state %O and block %O', state, block)
-    const header = block.header
 
+    // Header conditions
+    const header = block.header
     const now = this.getTime()
     need(header.time <= now, `header.time (${header.time}) cannot be in the future (after ${now})`)
-
     // assert work > latest.work / 2
     // assert block.prevTotalWork = latest.prevTotalWork + latest.work
+    need(state.hasHeader(ab2h(header.prev)), 'evaluate given a state, but it does not contain block.prev')
+    state.addHeader(header)
 
-    need(state.headers.has(header.prev), 'evaluate given a state, but it does not contain block.prev')
-
-    block.remerk()
-    need(block.header == header, 'merkle root must verify')
-
+    // Actions
     const actions = block.actions
     for (var a = 0; a < actions.length; a++) {
       var action = actions[a]
@@ -41,9 +42,14 @@ class Validator {
         var output = outputs[o]
         // check logic
       }
-      // action aggregate conditions
+      // Action aggregate conditions
     }
-    // block aggregate conditions
+
+    // Block aggregate conditions
+    const root = header.actroot
+    block.remerk()
+    need(header.actroot == root, 'merkle root must verify')
+
     return state
   }
 }

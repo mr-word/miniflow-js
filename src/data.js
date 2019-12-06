@@ -213,7 +213,8 @@ class Header extends MiniData {
 class Block extends MiniData {
   remerk () {
     const actIDs = this.actions.map((a) => h2ab(a.hashID()))
-    this.header.actroot = merkelize(actIDs)
+    this.header.actroot = ab2h(merkelize(actIDs))
+    return this
   }
 
   toJSON () {
