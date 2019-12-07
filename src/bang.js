@@ -59,7 +59,7 @@ const blk0act0 = {
 }
 
 const hdr0 = {
-  prev: ZERO,
+  prev: '',
   actroot: ZERO,
   xtrs: '',
   miner: ZERO,
@@ -75,7 +75,7 @@ const blk0 = {
 
 const block = data.Block.fromJSON(blk0)
 block.remerk()
-const bangwork = ab2h(hash(Buffer(h2ab(block.header.mixHash() + hdr0.fuzz))))
+const bangwork = ab2h(hash(Buffer(h2ab(block.header.mixHash() + hdr0.miner + hdr0.fuzz)))) // TODO fix
 debug(`bangwork ${bangwork}`)
 block.work = bangwork
 

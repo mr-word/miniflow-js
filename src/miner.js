@@ -10,8 +10,8 @@ function padleft (s, n, c) {
 }
 
 function work (mixhash, difficulty) {
-  debug(`data ${h2ab(mixhash)}`)
-  debug(`tuff ${padleft(difficulty.toString(16), 64, '0')}`)
+  debug(`data  ${h2ab(mixhash)}`)
+  debug(`tuff  ${padleft(difficulty.toString('hex'), 64, '0')}`)
   let w
   let i = 0
   const t = Date.now()

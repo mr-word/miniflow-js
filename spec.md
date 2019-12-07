@@ -1,41 +1,58 @@
-Output: RLP(
-    left: BIGNUM // region logic (0 means fungible garbage region)
-  , right: BIGNUM // region logic ('amount' when fungible garbage)
-  , data: BLOB // ignored by validation
-  , quorum: BIGNUM // multisig: K of len(pubkeyset)
-  , pubkeyidx: [BIGNUM] // indices into set of pubkeys in transaction
+```
+VAR256 is a nullable 256-bit unsigned integer represented by a variable number of bytes, from 0 to 32.
+It is not a variable-length encoding. The length is given by the surrounding RLP encoding. It is a UINT with N bytes, where 0 bytes means null.
+
+BLOB is an arbitrary array of bytes. Again, the length is given by the surrounding RLP encoding, and again a length of 0 is a null blob.
+
+HASH is 32 bytes
+PUBKEY is 32 bytes
+SIGNATURE is 64 bytes
+
+// UTXO Tag
+UTag: RLP(
+    actionHash: HASH(Action)
+  , outpubIndex: VAR256
 )
 
-Input: RLP(
-    actionHash: HASH(ACTION)
-  , outputIndex: BIGNUM
+// Familiar alias for RTXI case
+Input = UTag
+
+Output: RLP(
+    left: VAR256
+  , right: VAR256
+  , data: BLOB 
+  , lockQuorum: VAR256
+  , needQuorum: VAR256
+  , keyQuorum: VAR256
+  , locks: [UTag]
+  , needs: [UTag]
+  , pubkeys: [BIGNUM]
 )
 
 Action: RLP(
-    confirmHeader: HASH(HEADER)
-  , validSince: BIGNUM
-  , validUntil: BIGNUM
-  , inputs: [INPUT]
-  , outputs: [OUTPUT]
-  , pubkeys: [PUBKEY] // to de-duplicate pubkeys from outputs
-// mix = HASH(confirmHeader,validSince,validUntil,inputs,outputs,pubkeys)
-// signatures: [SIGNATURE(mix)]
-  , signatures: [SIGNATURE(HASH(confirmHeader,validSince,validUntil,inputs,outputs,pubkeys))]
+  , validSince: VAR256
+  , validUntil: VAR256
+  , inputs: [Input]
+  , outputs: [Output]
+  , locks: [UTag]
+  , needs: [UTag]
+  , pubkeys: [PUBKEY]
+  , signatures: [SIGNATURE(HASH(RLP(validSince,...,pubkeys)))] // sign hash of above fields RLP encoded in order (not raw prefix)
+  , extraData: [] // inserted by block producer
 )
 
 Header: RLP(
-// mix = HASH(noWorkHeader) = HASH(prevHash, txroot, pubkey, time)
-// work = HASH(mix)
-    work: HASH(HASH(HASH(HEADER), MERKLEROOT, PUBKEY, BIGNUM))
-  , prevHash: HASH(HEADER)
-  , txroot: MERKLEROOT(txtree)
+    prev: HASH(Header)
+  , actroot: HASH(...) // merkle tree
+  , xtrs: VAR256
   , miner: PUBKEY
   , time: BIGNUM
+  , fuzz: VAR256
+  , work: HASH(HASH(prev,...,time), fuzz) // hash raw concatenation, not RLP encoding
 )
 
 Block: RLP(
-    header: HEADER
-  , txs: [ACTION]
+    header: Header
+  , txs: [Action]
 )
-
-
+```

@@ -92,10 +92,10 @@ class BlockTree {
     this.multistate = immutable.Map()
     this.refs = new Map()
 
-    this.multistate = this.multistate.set(L(['header', ZERO]), ZERO)
-    this.refs.set(ZERO, this.multistate)
+    this.multistate = this.multistate.set(L(['header', '']), true) // can't set empty string, interprets as delete
+    this.refs.set('', this.multistate)
 
-    let s = this.checkout(ZERO)
+    let s = this.checkout('')
     s.insertBlock(block0)
     this.commit(block0.header.hashID(), s)
   }

@@ -13,6 +13,8 @@ describe('miner', () => {
   it('mines to a difficulty', () => {
     const data = '1'.repeat(64)
     const fuzz = miner.work(data, difficulty)
+    debug('TODO')
+    throw new Error('TODO check result')
   })
   it('mines a header mixhash', () => {
     const header = Header.fromJSON({
@@ -27,5 +29,6 @@ describe('miner', () => {
     const mix = header.mixHash()
     const fuzz = miner.work(mix, difficulty)
     debug('fuzz ' + fuzz.toString('hex'))
+    throw new Error('TODO check result')
   })
 })
