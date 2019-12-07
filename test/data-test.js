@@ -37,8 +37,8 @@ const actionJSON = {
 
 const headerJSON = {
   prev: '',
-  prevTotalWork: n2hex(0),
   actroot: '',
+  xtrs: '',
   miner: '9999',
   time: n2hex(1),
   fuzz: '',

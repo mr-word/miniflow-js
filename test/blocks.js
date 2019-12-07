@@ -8,12 +8,12 @@ const ZERO = '0'.repeat(64)
 const block1 = Block.fromJSON({
   header: {
     prev: block0.header.hashID(),
-    prevTotalWork: 1,
     actroot: ZERO, // .remerk()
+    xtrs: '',
     miner: ab2h(Buffer(keypair.publicKey)),
     time: Date.now(),
     fuzz: '',
-    work: '7' + 'f'.repeat(63) // .work()
+    work: 'e' + 'f'.repeat(63) // .work()
   },
   actions: [{
     validSince: 0,

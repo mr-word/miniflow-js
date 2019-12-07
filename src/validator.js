@@ -37,16 +37,12 @@ class Validator {
 
     const OVER256 = (new BN(2)).pow(new BN(256))
     const prevWorkNum = OVER256.sub(new BN(Buffer(prev.work)))
-    const prevTotalWork = prev.prevTotalWork.add(prevWorkNum.mod(OVER256))
-    debug(`prevWorkNum ${prevWorkNum.toString(16)} prevTotalWork ${prevTotalWork}`)
-    debug(`header.prevTotalWork ${header.prevTotalWork}`)
-    need(header.prevTotalWork.eq(prevTotalWork), `header's prevTotalWork doesn't correctly add prev.work`)
 
     const headWorkNum = OVER256.sub(new BN(Buffer(header.work)))
     debug(`headWorkNum ${headWorkNum.toString(16)}`)
 
     // dpow
-    need(headWorkNum >= prevWorkNum * 2, 'not enough work')
+    need(headWorkNum.gt(prevWorkNum.mul(new BN(2))), 'not enough work')
 
     const root = header.actroot
     block.remerk()

@@ -17,8 +17,8 @@ describe('miner', () => {
   it('mines a header mixhash', () => {
     const header = Header.fromJSON({
       prev: '',
-      prevTotalWork: 0,
       actroot: '',
+      xtrs: '',
       miner: '',
       time: 0,
       fuzz: '',

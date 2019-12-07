@@ -182,8 +182,8 @@ class Header extends MiniData {
   mixHash () {
     return ab2h(hash(Buffer.concat([
       Buffer(this.prev),
-      this.prevTotalWork.toBuffer(),
       Buffer(this.actroot),
+      Buffer(this.xtrs),
       Buffer(this.miner),
       this.time.toBuffer()
     ])))
@@ -192,8 +192,8 @@ class Header extends MiniData {
   toJSON () {
     return {
       prev: ab2h(this.prev),
-      prevTotalWork: ab2h(this.prevTotalWork.toBuffer()),
       actroot: ab2h(this.actroot),
+      xtrs: ab2h(this.xtrs),
       miner: ab2h(this.miner),
       time: ab2h(this.time.toBuffer()),
       fuzz: ab2h(this.fuzz),
@@ -204,8 +204,8 @@ class Header extends MiniData {
   toPreRLP () {
     return [
       Buffer(this.prev),
-      this.prevTotalWork.toBuffer(),
       Buffer(this.actroot),
+      Buffer(this.xtrs),
       Buffer(this.miner),
       this.time.toBuffer(),
       Buffer(this.fuzz),
@@ -217,8 +217,8 @@ class Header extends MiniData {
     debug('Header.fromJSON %O', obj)
     const header = new Header()
     header.prev = h2ab(obj.prev)
-    header.prevTotalWork = new BN(obj.prevTotalWork)
     header.actroot = h2ab(obj.actroot)
+    header.xtrs = h2ab(obj.xtrs)
     header.miner = h2ab(obj.miner)
     header.time = new BN(obj.time)
     header.fuzz = h2ab(obj.fuzz)
@@ -230,8 +230,8 @@ class Header extends MiniData {
     debug('Header.fromPreRLP %O', list)
     return this.fromJSON({
       prev: ab2h(list[0]),
-      prevTotalWork: new BN(list[1]),
-      actroot: ab2h(list[2]),
+      actroot: ab2h(list[1]),
+      xtrs: ab2h(list[2]),
       miner: ab2h(list[3]),
       time: new BN(list[4]),
       fuzz: ab2h(list[5]),
