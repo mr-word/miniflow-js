@@ -23,7 +23,7 @@ describe('miner', () => {
       prev: '',
       actroot: '',
       xtrs: '',
-      miner: '',
+      node: '',
       time: '00',
       fuzz: '',
       work: ''
@@ -33,7 +33,7 @@ describe('miner', () => {
       Buffer.from(header.prev, 'hex'),
       Buffer.from(header.actroot, 'hex'),
       Buffer.from(header.xtrs, 'hex'),
-      Buffer.from(header.miner, 'hex'),
+      Buffer.from(header.node, 'hex'),
       Buffer.from(header.time, 'hex')
     ])))
     want(mix == checkmix, 'wrong computed mixhash')

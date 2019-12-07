@@ -11,7 +11,7 @@ SIGNATURE is 64 bytes
 // UTXO Tag
 UTag: RLP(
     actionHash: HASH(Action)
-  , outpubIndex: VAR256
+  , outputIndex: VAR256
 )
 
 // Familiar alias for RTXI case
@@ -34,11 +34,9 @@ Action: RLP(
   , validUntil: VAR256
   , inputs: [Input]
   , outputs: [Output]
-  , locks: [UTag]
-  , needs: [UTag]
-  , pubkeys: [PUBKEY]
+  , requireHeader: HASH(Header)
   , signatures: [SIGNATURE(HASH(RLP(validSince,...,pubkeys)))] // sign hash of above fields RLP encoded in order (not raw prefix)
-  , extraData: [] // inserted by block producer
+  , extraData: BLOB // inserted by block producer
 )
 
 Header: RLP(

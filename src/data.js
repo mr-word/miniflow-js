@@ -1,23 +1,27 @@
 const debug = require('debug')('miniflow:data')
-const BN = require('BN.js')
+
 const rlp = require('rlp')
 const h2ab = require('hex-to-array-buffer')
 const ab2h = require('array-buffer-to-hex')
+const BN = require('BN.js')
+
 const { hash } = require('../src/crypto.js')
 const { merkelize } = require('../src/merkle.js')
 
-class VARNUM extends BN {
-  toHex() {
+class Varnum extends BN {
+  toHex () {
     return this.toBuffer().toString('hex')
   }
-  static fromHex(hex) {
-    return VARNUM.from(hex, 'hex')
+
+  static fromHex (hex) {
+    return Varnum.from(hex, 'hex')
   }
-  static fromBuffer(buffer) {
-    if( buffer.length > 32) {
-        throw new Error(`VARNUM.fromBuffer got buffer.length > 32: buffer: ${buffer}`)
+
+  static fromBuffer (buffer) {
+    if (buffer.length > 32) {
+      throw new Error(`Varnum.fromBuffer got buffer.length > 32: buffer: ${buffer}`)
     }
-    return new VARNUM(Buffer.from(buffer))
+    return new Varnum(Buffer.from(buffer))
   }
 }
 
@@ -144,7 +148,7 @@ class Action extends MiniData {
       validUntil: ab2h(this.validUntil),
       inputs: this.inputs.map((i) => i.toJSON()),
       outputs: this.outputs.map((o) => o.toJSON()),
-      confirmHeader: ab2h(this.confirmHeader),
+      requireHeader: ab2h(this.requireHeader),
       signatures: this.signatures.map(ab2h),
       extraData: ab2h(this.extraData)
     }
@@ -156,7 +160,7 @@ class Action extends MiniData {
       this.validUntil,
       this.inputs.map((i) => i.toPreRLP()),
       this.outputs.map((o) => o.toPreRLP()),
-      this.confirmHeader,
+      this.requireHeader,
       this.signatures.map((s) => Buffer(s)),
       this.extraData
     ]
@@ -169,7 +173,7 @@ class Action extends MiniData {
     action.validUntil = (new BN(obj.validUntil)).toBuffer()
     action.inputs = obj.inputs.map((i) => Input.fromJSON(i))
     action.outputs = obj.outputs.map((o) => Output.fromJSON(o))
-    action.confirmHeader = Buffer.from(obj.confirmHeader, 'hex')
+    action.requireHeader = Buffer.from(obj.requireHeader, 'hex')
     action.signatures = obj.signatures.map((s) => Buffer.from(s, 'hex'))
     action.extraData = Buffer.from(obj.extraData, 'hex')
     return action
@@ -182,7 +186,7 @@ class Action extends MiniData {
       validUntil: new BN(list[1]),
       inputs: list[2].map((i) => Input.fromPreRLP(i).toJSON()),
       outputs: list[3].map((o) => Output.fromPreRLP(o).toJSON()),
-      confirmHeader: ab2h(list[4]),
+      requireHeader: ab2h(list[4]),
       signatures: list[5].map(ab2h),
       extraData: ab2h(list[6])
     })
@@ -199,7 +203,7 @@ class Header extends MiniData {
       Buffer(this.prev),
       Buffer(this.actroot),
       Buffer(this.xtrs),
-      Buffer(this.miner),
+      Buffer(this.node),
       Buffer(this.time)
     ])))
   }
@@ -209,7 +213,7 @@ class Header extends MiniData {
       prev: ab2h(this.prev),
       actroot: ab2h(this.actroot),
       xtrs: ab2h(this.xtrs),
-      miner: ab2h(this.miner),
+      node: ab2h(this.node),
       time: ab2h(this.time),
       fuzz: ab2h(this.fuzz),
       work: ab2h(this.work)
@@ -221,7 +225,7 @@ class Header extends MiniData {
       Buffer(this.prev),
       Buffer(this.actroot),
       Buffer(this.xtrs),
-      Buffer(this.miner),
+      Buffer(this.node),
       Buffer(this.time),
       Buffer(this.fuzz),
       Buffer(this.work)
@@ -234,7 +238,7 @@ class Header extends MiniData {
     header.prev = h2ab(obj.prev)
     header.actroot = h2ab(obj.actroot)
     header.xtrs = h2ab(obj.xtrs)
-    header.miner = h2ab(obj.miner)
+    header.node = h2ab(obj.node)
     header.time = h2ab(obj.time)
     header.fuzz = h2ab(obj.fuzz)
     header.work = h2ab(obj.work)
@@ -247,7 +251,7 @@ class Header extends MiniData {
       prev: ab2h(list[0]),
       actroot: ab2h(list[1]),
       xtrs: ab2h(list[2]),
-      miner: ab2h(list[3]),
+      node: ab2h(list[3]),
       time: ab2h(list[4]),
       fuzz: ab2h(list[5]),
       work: ab2h(list[6])
@@ -293,4 +297,4 @@ class Block extends MiniData {
   }
 }
 
-module.exports = { VARNUM, Input, Output, Action, Header, Block }
+module.exports = { Varnum, Input, Output, Action, Header, Block }

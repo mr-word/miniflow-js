@@ -8,7 +8,6 @@ const { BlockTree } = require('../src/blocktree.js')
 
 const ab2h = require('array-buffer-to-hex')
 const h2ab = require('hex-to-array-buffer')
-const ZERO = ab2h(new ArrayBuffer(32))
 const BANG = bang.header.hashID()
 
 describe('blocktree', () => {

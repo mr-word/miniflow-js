@@ -30,7 +30,7 @@ const actionJSON = {
   validUntil: n2hex(1),
   inputs: [inputJSON],
   outputs: [outputJSON],
-  confirmHeader: '',
+  requireHeader: '',
   signatures: ['b0bd55', 'cadf55'],
   extraData: 'e5dada' // NOT SIGNED - inserted/replaced by block producer
 }
@@ -39,7 +39,7 @@ const headerJSON = {
   prev: '',
   actroot: '',
   xtrs: '',
-  miner: '9999',
+  node: '',
   time: n2hex(1),
   fuzz: '',
   work: '00111111'

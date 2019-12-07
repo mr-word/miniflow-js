@@ -1,5 +1,6 @@
-const BN = require('bn.js')
 const debug = require('debug')('miniflow:miner')
+
+const BN = require('bn.js')
 const ab2h = require('array-buffer-to-hex')
 const h2ab = require('hex-to-array-buffer')
 

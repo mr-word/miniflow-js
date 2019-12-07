@@ -1,11 +1,13 @@
 const debug = require('debug')('miniflow:validator')
+
 const immutable = require('immutable')
-const { BlockTree } = require('../src/blocktree.js')
-const { VARNUM } = require('../src/data.js')
-const { hash } = require('../src/crypto.js')
 const ab2h = require('array-buffer-to-hex')
 const h2ab = require('hex-to-array-buffer')
 const BN = require('bn.js')
+
+const { BlockTree } = require('../src/blocktree.js')
+const { Varnum } = require('../src/data.js')
+const { hash } = require('../src/crypto.js')
 
 class ValidationError extends Error {}
 
@@ -30,7 +32,7 @@ class Validator {
     debug('evaluate given state %O and block %O', state, block)
     debug('header %O', header)
 
-    need(VARNUM.fromBuffer(header.time).lt(new VARNUM(this.now)),
+    need(Varnum.fromBuffer(header.time).lt(new Varnum(this.now)),
         `header.time (${header.time}) cannot be in the future (after ${this.now})`)
     const HEAD = header.hashID()
     const PREV = ab2h(header.prev)

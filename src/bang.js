@@ -1,11 +1,12 @@
-const data = require('../src/data.js')
+const debug = require('debug')('miniflow:data')
+
 const BN = require('bn.js')
 const ab2h = require('array-buffer-to-hex')
 const h2ab = require('hex-to-array-buffer')
-const { hash } = require('../src/crypto.js')
-const debug = require('debug')('miniflow:data')
 
-const ZERO = '0'.repeat(64)
+const data = require('../src/data.js')
+const { hash } = require('../src/crypto.js')
+
 bn2hex = (bn) => ab2h(bn.toBuffer())
 n2hex = (n) => bn2hex(new BN(n))
 
@@ -53,7 +54,7 @@ const act0 = {
   validUntil: '',
   inputs: [in0],
   outputs: [out0, out1, out2],
-  confirmHeader: '',
+  requireHeader: '',
   signatures: [],
   extraData: ''
 }
@@ -62,7 +63,7 @@ const hdr0 = {
   prev: '',
   actroot: '',
   xtrs: '',
-  miner: '',
+  node: '',
   time: '',
   fuzz: '',
   work: 'f'.repeat(64)
@@ -75,7 +76,7 @@ const blk0 = {
 
 const block = data.Block.fromJSON(blk0)
 block.remerk()
-const bangwork = ab2h(hash(Buffer(h2ab(block.header.mixHash() + hdr0.miner + hdr0.fuzz)))) // TODO fix
+const bangwork = ab2h(hash(Buffer(h2ab(block.header.mixHash() + hdr0.node + hdr0.fuzz)))) // TODO fix
 debug(`bangwork ${bangwork}`)
 block.work = bangwork
 

@@ -17,10 +17,8 @@
     "blake2": "^4.0.0",
     "bn.js": "^5.0.0",
     "debug": "^4.1.1",
-    "eccrypto": "^1.1.2",
     "hex-to-array-buffer": "^1.1.0",
     "immutable": "^4.0.0-rc.12",
-    "libsodium": "^0.7.6",
     "rlp": "^2.2.4",
     "tweetnacl": "^1.0.1"
   }

@@ -4,7 +4,6 @@ const { Validator, ValidationError } = require('../src/validator.js')
 const want = require('chai').expect
 const bang = require('../src/bang')
 const { block1 } = require('../test/blocks.js')
-const ZERO = '0'.repeat(64)
 
 const h2ab = require('hex-to-array-buffer')
 

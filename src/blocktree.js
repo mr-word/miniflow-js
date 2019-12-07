@@ -1,11 +1,10 @@
+const debug = require('debug')('miniflow:state')
+
 const immutable = require('immutable')
 const L = immutable.List
-const debug = require('debug')('miniflow:state')
 const ab2h = require('array-buffer-to-hex')
 const h2ab = require('hex-to-array-buffer')
 const BN = require('bn.js')
-
-const ZERO = ab2h(new ArrayBuffer(32))
 
 class State {
   constructor (multistate) {
@@ -100,7 +99,6 @@ class BlockTree {
     this.commit(block0.header.hashID(), s)
   }
 
-  // future: lockless transparent reference giving `addHeader`, etc
   checkout (header) {
     if (!this.refs.has(header)) {
       throw new Error(`trying to checkout a header that doesn't exist: ${header}`)
