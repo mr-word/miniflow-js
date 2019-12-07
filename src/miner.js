@@ -10,7 +10,7 @@ function padleft (s, n, c) {
 }
 
 function work (mixhash, difficulty) {
-  debug(`data  ${h2ab(mixhash)}`)
+  debug(`data  ${mixhash}`)
   debug(`tuff  ${padleft(difficulty.toString('hex'), 64, '0')}`)
   let w
   let i = 0

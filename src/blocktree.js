@@ -29,21 +29,21 @@ class State {
   }
 
   isUnspent (txid, idx) {
-    if(typeof(txid) != 'string') throw new Error('use hex string keys for txid')
-    if(typeof(idx) != 'string') throw new Error('use hex string keys for idx')
+    if (typeof (txid) !== 'string') throw new Error('use hex string keys for txid')
+    if (typeof (idx) !== 'string') throw new Error('use hex string keys for idx')
     return this.multistate.has(L(['utxo', txid, idx]))
   }
 
   addUTXO (txid, idx) {
-    if(typeof(txid) != 'string') throw new Error('use hex string keys for txid')
-    if(typeof(idx) != 'string') throw new Error('use hex string keys for idx')
+    if (typeof (txid) !== 'string') throw new Error('use hex string keys for txid')
+    if (typeof (idx) !== 'string') throw new Error('use hex string keys for idx')
     debug('adding utxo %O', [txid, idx])
     this.multistate = this.multistate.set(L(['utxo', txid, idx]), true)
   }
 
   delUTXO (txid, idx) {
-    if(typeof(txid) != 'string') throw new Error('use hex string keys for txid')
-    if(typeof(idx) != 'string') throw new Error('use hex string keys for idx')
+    if (typeof (txid) !== 'string') throw new Error('use hex string keys for txid')
+    if (typeof (idx) !== 'string') throw new Error('use hex string keys for idx')
     debug('deleting utxo %O', [txid, idx])
     this.multistate = this.multistate.delete(L(['utxo', txid, idx]))
   }
@@ -95,7 +95,7 @@ class BlockTree {
     this.multistate = this.multistate.set(L(['header', '']), true) // can't set empty string, interprets as delete
     this.refs.set('', this.multistate)
 
-    let s = this.checkout('')
+    const s = this.checkout('')
     s.insertBlock(block0)
     this.commit(block0.header.hashID(), s)
   }

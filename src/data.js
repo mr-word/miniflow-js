@@ -155,7 +155,7 @@ class Action extends MiniData {
     action.inputs = obj.inputs.map((i) => Input.fromJSON(i))
     action.outputs = obj.outputs.map((o) => Output.fromJSON(o))
     action.confirmHeader = Buffer.from(obj.confirmHeader, 'hex')
-    action.signatures = obj.signatures.map((s)=>Buffer.from(s, 'hex'))
+    action.signatures = obj.signatures.map((s) => Buffer.from(s, 'hex'))
     action.extraData = Buffer.from(obj.extraData, 'hex')
     return action
   }

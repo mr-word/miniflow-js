@@ -1,6 +1,7 @@
 const debug = require('debug')('miniflow:validator')
 const immutable = require('immutable')
 const { BlockTree } = require('../src/blocktree.js')
+const { hash } = require('../src/crypto.js')
 const ab2h = require('array-buffer-to-hex')
 const h2ab = require('hex-to-array-buffer')
 const BN = require('bn.js')
@@ -16,24 +17,24 @@ class Validator {
     this.now = 0
   }
 
-  getTime() { return Date.now() }
+  getTime () { return Date.now() }
 
   // returns state ref or throw error
   evaluate (state, block, headerOnly = false) {
-    if(!typeof(block) == 'Block') {
-        throw new TypeError(`evaluate: not a block: %O`, block)
+    if (!typeof (block) == 'Block') {
+      throw new TypeError('evaluate: not a block: %O', block)
     }
     this.now = this.getTime()
     const header = block.header
     debug('evaluate given state %O and block %O', state, block)
-    debug(`header %O`, header)
+    debug('header %O', header)
 
     need(header.time <= this.now, `header.time (${header.time}) cannot be in the future (after ${this.now})`)
     const HEAD = header.hashID()
     const PREV = ab2h(header.prev)
     need(state.hasHeader(PREV), 'evaluate given a state, but it does not contain block.prev')
     const prev = state.getHeader(PREV)
-    debug(`evaluated header's prev: %s, prevHeader %O`, PREV, prev)
+    debug('evaluated header\'s prev: %s, prevHeader %O', PREV, prev)
 
     const OVER256 = (new BN(2)).pow(new BN(256))
     const prevWorkNum = OVER256.sub(new BN(Buffer(prev.work)))
@@ -43,6 +44,14 @@ class Validator {
 
     // dpow
     need(headWorkNum.gt(prevWorkNum.mul(new BN(2))), 'not enough work')
+
+    const mix = header.mixHash()
+    const fuzz = header.fuzz
+    const workload = [Buffer.from(mix, 'hex'), Buffer.from(fuzz, 'hex')]
+    const trueHash = ab2h(hash(Buffer.concat(workload)))
+    debug(`trueHash ${trueHash}`)
+    debug(`givenHash ${header.work.toString('hex')}`)
+    need(header.work.toString('hex') == trueHash, 'proof of work does not validate')
 
     const root = header.actroot
     block.remerk()
@@ -74,7 +83,6 @@ class Validator {
 
     return state
   }
-
 }
 
 module.exports = { Validator, ValidationError }

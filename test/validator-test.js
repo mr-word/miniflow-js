@@ -20,7 +20,7 @@ describe('validator', () => {
   })
   it('test block1 nomerk', () => {
     s = b.checkout(bang.header.hashID())
-    block1.header.actroot = h2ab(ZERO)
+    block1.header.actroot = h2ab('')
     want(() => v.evaluate(s, block1)).to.throw(ValidationError)
   })
 })
