@@ -1,4 +1,4 @@
-const { Block } = require('../src/data.js')
+const { Block, VARNUM } = require('../src/data.js')
 const { hash } = require('../src/crypto.js')
 const keypair = require('../test/crypto-test.js').testKeyPair()
 const block0 = require('../src/bang.js')
@@ -11,10 +11,10 @@ const ZERO = '0'.repeat(64)
 const block1 = Block.fromJSON({
   header: {
     prev: block0.header.hashID(),
-    actroot: ZERO, // .remerk()
+    actroot: '', // .remerk()
     xtrs: '',
     miner: ab2h(Buffer(keypair.publicKey)),
-    time: Date.now(),
+    time: new VARNUM(Date.now()).toHex(),
     fuzz: '',
     work: 'f'.repeat(64) // .work()
   },

@@ -24,7 +24,7 @@ describe('miner', () => {
       actroot: '',
       xtrs: '',
       miner: '',
-      time: 0,
+      time: '00',
       fuzz: '',
       work: ''
     })
@@ -34,7 +34,7 @@ describe('miner', () => {
       Buffer.from(header.actroot, 'hex'),
       Buffer.from(header.xtrs, 'hex'),
       Buffer.from(header.miner, 'hex'),
-      Buffer.from(header.time.toBuffer(), 'hex')
+      Buffer.from(header.time, 'hex')
     ])))
     want(mix == checkmix, 'wrong computed mixhash')
     const fuzz = miner.work(mix, difficulty)

@@ -6,6 +6,21 @@ const ab2h = require('array-buffer-to-hex')
 const { hash } = require('../src/crypto.js')
 const { merkelize } = require('../src/merkle.js')
 
+class VARNUM extends BN {
+  toHex() {
+    return this.toBuffer().toString('hex')
+  }
+  static fromHex(hex) {
+    return VARNUM.from(hex, 'hex')
+  }
+  static fromBuffer(buffer) {
+    if( buffer.length > 32) {
+        throw new Error(`VARNUM.fromBuffer got buffer.length > 32: buffer: ${buffer}`)
+    }
+    return new VARNUM(Buffer.from(buffer))
+  }
+}
+
 class MiniData {
   static fromBytes (bytes) {
     return this.fromPreRLP(rlp.decode(bytes))
@@ -63,8 +78,8 @@ class Input extends UTag {}
 class Output extends MiniData {
   toJSON () {
     return {
-      left: ab2h(this.left.toBuffer()),
-      right: ab2h(this.right.toBuffer()),
+      left: ab2h(this.left),
+      right: ab2h(this.right),
       data: ab2h(this.data),
       lockQuorum: ab2h(this.lockQuorum.toBuffer()),
       needQuorum: ab2h(this.needQuorum.toBuffer()),
@@ -77,8 +92,8 @@ class Output extends MiniData {
 
   toPreRLP () {
     return [
-      this.left.toBuffer(),
-      this.right.toBuffer(),
+      Buffer(this.left),
+      Buffer(this.right),
       Buffer(this.data),
       this.lockQuorum.toBuffer(),
       this.needQuorum.toBuffer(),
@@ -91,8 +106,8 @@ class Output extends MiniData {
 
   static fromJSON (obj) {
     const output = new Output()
-    output.left = new BN(obj.left)
-    output.right = new BN(obj.right)
+    output.left = h2ab(obj.left)
+    output.right = h2ab(obj.right)
     output.data = h2ab(obj.data)
     output.lockQuorum = new BN(obj.lockQuorum)
     output.needQuorum = new BN(obj.needQuorum)
@@ -105,8 +120,8 @@ class Output extends MiniData {
 
   static fromPreRLP (list) {
     return this.fromJSON({
-      left: new BN(list[0]),
-      right: new BN(list[1]),
+      left: ab2h(list[0]),
+      right: ab2h(list[1]),
       data: ab2h(list[2]),
       lockQuorum: new BN(list[3]),
       needQuorum: new BN(list[4]),
@@ -185,7 +200,7 @@ class Header extends MiniData {
       Buffer(this.actroot),
       Buffer(this.xtrs),
       Buffer(this.miner),
-      this.time.toBuffer()
+      Buffer(this.time)
     ])))
   }
 
@@ -195,7 +210,7 @@ class Header extends MiniData {
       actroot: ab2h(this.actroot),
       xtrs: ab2h(this.xtrs),
       miner: ab2h(this.miner),
-      time: ab2h(this.time.toBuffer()),
+      time: ab2h(this.time),
       fuzz: ab2h(this.fuzz),
       work: ab2h(this.work)
     }
@@ -207,7 +222,7 @@ class Header extends MiniData {
       Buffer(this.actroot),
       Buffer(this.xtrs),
       Buffer(this.miner),
-      this.time.toBuffer(),
+      Buffer(this.time),
       Buffer(this.fuzz),
       Buffer(this.work)
     ]
@@ -220,7 +235,7 @@ class Header extends MiniData {
     header.actroot = h2ab(obj.actroot)
     header.xtrs = h2ab(obj.xtrs)
     header.miner = h2ab(obj.miner)
-    header.time = new BN(obj.time)
+    header.time = h2ab(obj.time)
     header.fuzz = h2ab(obj.fuzz)
     header.work = h2ab(obj.work)
     return header
@@ -233,7 +248,7 @@ class Header extends MiniData {
       actroot: ab2h(list[1]),
       xtrs: ab2h(list[2]),
       miner: ab2h(list[3]),
-      time: new BN(list[4]),
+      time: ab2h(list[4]),
       fuzz: ab2h(list[5]),
       work: ab2h(list[6])
     })
@@ -278,4 +293,4 @@ class Block extends MiniData {
   }
 }
 
-module.exports = { Input, Output, Action, Header, Block }
+module.exports = { VARNUM, Input, Output, Action, Header, Block }

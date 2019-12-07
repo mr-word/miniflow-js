@@ -15,8 +15,8 @@ const in0 = {
 }
 
 const out0 = {
-  left: 0,
-  right: 0,
+  left: '00',
+  right: '00',
   data: '',
   lockQuorum: 0,
   needQuorum: 0,
@@ -26,8 +26,8 @@ const out0 = {
   pubkeys: []
 }
 const out1 = {
-  left: 0,
-  right: 1,
+  left: '00',
+  right: '01',
   data: '',
   lockQuorum: 0,
   needQuorum: 0,
@@ -37,8 +37,8 @@ const out1 = {
   pubkeys: []
 }
 const out2 = {
-  left: 1,
-  right: (new BN(2)).pow(new BN(256)).sub(new BN(1)),
+  left: '01',
+  right: 'f'.repeat(64),
   data: '',
   lockQuorum: 0,
   needQuorum: 0,
@@ -48,29 +48,29 @@ const out2 = {
   pubkeys: []
 }
 
-const blk0act0 = {
+const act0 = {
   validSince: '',
   validUntil: '',
   inputs: [in0],
   outputs: [out0, out1, out2],
-  confirmHeader: ZERO,
+  confirmHeader: '',
   signatures: [],
-  extraData: ZERO
+  extraData: ''
 }
 
 const hdr0 = {
   prev: '',
-  actroot: ZERO,
+  actroot: '',
   xtrs: '',
-  miner: ZERO,
-  time: n2hex(0),
-  fuzz: ZERO,
+  miner: '',
+  time: '',
+  fuzz: '',
   work: 'f'.repeat(64)
 }
 
 const blk0 = {
   header: hdr0,
-  actions: [blk0act0]
+  actions: [act0]
 }
 
 const block = data.Block.fromJSON(blk0)

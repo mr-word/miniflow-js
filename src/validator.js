@@ -1,6 +1,7 @@
 const debug = require('debug')('miniflow:validator')
 const immutable = require('immutable')
 const { BlockTree } = require('../src/blocktree.js')
+const { VARNUM } = require('../src/data.js')
 const { hash } = require('../src/crypto.js')
 const ab2h = require('array-buffer-to-hex')
 const h2ab = require('hex-to-array-buffer')
@@ -29,7 +30,8 @@ class Validator {
     debug('evaluate given state %O and block %O', state, block)
     debug('header %O', header)
 
-    need(header.time <= this.now, `header.time (${header.time}) cannot be in the future (after ${this.now})`)
+    need(VARNUM.fromBuffer(header.time).lt(new VARNUM(this.now)),
+        `header.time (${header.time}) cannot be in the future (after ${this.now})`)
     const HEAD = header.hashID()
     const PREV = ab2h(header.prev)
     need(state.hasHeader(PREV), 'evaluate given a state, but it does not contain block.prev')
