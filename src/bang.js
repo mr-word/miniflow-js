@@ -35,7 +35,7 @@ const out1 = {
 }
 const out2 = {
   left: 1,
-  right: 7,
+  right: (new BN(2)).pow(new BN(256)).sub(new BN(1)),
   data: '',
   lockQuorum: 0,
   needQuorum: 0,
@@ -50,9 +50,9 @@ const blk0act0 = {
   validUntil: n2hex(0),
   inputs: [in0],
   outputs: [out0, out1, out2],
-  confirmHeader: '',
+  confirmHeader: ZERO,
   signatures: [],
-  extraData: ''
+  extraData: ZERO
 }
 
 const hdr0 = {
@@ -62,7 +62,7 @@ const hdr0 = {
   miner: ZERO,
   time: n2hex(0),
   fuzz: ZERO,
-  work: ZERO
+  work: 'f'.repeat(64)
 }
 
 const blk0 = {

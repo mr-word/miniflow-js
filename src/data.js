@@ -30,30 +30,30 @@ class UTag extends MiniData {
   toJSON () {
     return {
       action: ab2h(this.action),
-      index: ab2h(this.index.toBuffer())
+      index: ab2h(this.index)
     }
   }
 
   toPreRLP () {
     return [
-      Buffer(this.action),
-      this.index.toBuffer()
+      this.action,
+      this.index
     ]
   }
 
   static fromJSON (obj) {
     debug('UTag.fromJSON %O', obj)
     const input = new Input()
-    input.action = h2ab(obj.action),
-    input.index = new BN(obj.index)
+    input.action = Buffer.from(obj.action, 'hex'),
+    input.index = (new BN(obj.index)).toBuffer()
     return input
   }
 
   static fromPreRLP (list) {
     debug('UTag.fromPreRLP %O', list)
     return this.fromJSON({
-      action: ab2h(list[0]),
-      index: new BN(list[1])
+      action: list[0].toString('hex'),
+      index: new BN(list[1].toString('hex'), 16)
     })
   }
 }
@@ -69,8 +69,8 @@ class Output extends MiniData {
       lockQuorum: ab2h(this.lockQuorum.toBuffer()),
       needQuorum: ab2h(this.needQuorum.toBuffer()),
       keyQuorum: ab2h(this.keyQuorum.toBuffer()),
-      locks: this.locks.map((utag)=>utag.toJSON()),
-      needs: this.needs.map((utag)=>utag.toJSON()),
+      locks: this.locks.map((utag) => utag.toJSON()),
+      needs: this.needs.map((utag) => utag.toJSON()),
       pubkeys: this.pubkeys.map(ab2h)
     }
   }
@@ -83,8 +83,8 @@ class Output extends MiniData {
       this.lockQuorum.toBuffer(),
       this.needQuorum.toBuffer(),
       this.keyQuorum.toBuffer(),
-      this.locks.map((utag)=>utag.toPreRLP()),
-      this.needs.map((utag)=>utag.toPreRLP()),
+      this.locks.map((utag) => utag.toPreRLP()),
+      this.needs.map((utag) => utag.toPreRLP()),
       this.pubkeys.map((x) => Buffer(x))
     ]
   }
@@ -97,8 +97,8 @@ class Output extends MiniData {
     output.lockQuorum = new BN(obj.lockQuorum)
     output.needQuorum = new BN(obj.needQuorum)
     output.keyQuorum = new BN(obj.keyQuorum)
-    output.locks = obj.locks.map((utag)=>UTag.fromJSON(utag))
-    output.needs = obj.needs.map((utag)=>UTag.fromJSON(utag))
+    output.locks = obj.locks.map((utag) => UTag.fromJSON(utag))
+    output.needs = obj.needs.map((utag) => UTag.fromJSON(utag))
     output.pubkeys = obj.pubkeys.map(h2ab)
     return output
   }
@@ -111,8 +111,8 @@ class Output extends MiniData {
       lockQuorum: new BN(list[3]),
       needQuorum: new BN(list[4]),
       keyQuorum: new BN(list[5]),
-      locks: list[6].map((utag)=>UTag.fromPreRLP(utag).toJSON()),
-      needs: list[7].map((utag)=>UTag.fromPreRLP(utag).toJSON()),
+      locks: list[6].map((utag) => UTag.fromPreRLP(utag).toJSON()),
+      needs: list[7].map((utag) => UTag.fromPreRLP(utag).toJSON()),
       pubkeys: list[8].map(ab2h)
     })
   }
@@ -125,8 +125,8 @@ class Action extends MiniData {
 
   toJSON () {
     return {
-      validSince: ab2h(this.validSince.toBuffer()),
-      validUntil: ab2h(this.validUntil.toBuffer()),
+      validSince: ab2h(this.validSince),
+      validUntil: ab2h(this.validUntil),
       inputs: this.inputs.map((i) => i.toJSON()),
       outputs: this.outputs.map((o) => o.toJSON()),
       confirmHeader: ab2h(this.confirmHeader),
@@ -137,26 +137,26 @@ class Action extends MiniData {
 
   toPreRLP () {
     return [
-      this.validSince.toBuffer(),
-      this.validUntil.toBuffer(),
+      this.validSince,
+      this.validUntil,
       this.inputs.map((i) => i.toPreRLP()),
       this.outputs.map((o) => o.toPreRLP()),
-      Buffer(this.confirmHeader),
+      this.confirmHeader,
       this.signatures.map((s) => Buffer(s)),
-      Buffer(this.extraData)
+      this.extraData
     ]
   }
 
   static fromJSON (obj) {
     debug('Action.fromJSON %O', obj)
     const action = new Action()
-    action.validSince = new BN(obj.validSince)
-    action.validUntil = new BN(obj.validUntil)
+    action.validSince = (new BN(obj.validSince)).toBuffer()
+    action.validUntil = (new BN(obj.validUntil)).toBuffer()
     action.inputs = obj.inputs.map((i) => Input.fromJSON(i))
     action.outputs = obj.outputs.map((o) => Output.fromJSON(o))
-    action.confirmHeader = h2ab(obj.confirmHeader)
-    action.signatures = obj.signatures.map(h2ab)
-    action.extraData = h2ab(obj.extraData)
+    action.confirmHeader = Buffer.from(obj.confirmHeader, 'hex')
+    action.signatures = obj.signatures.map((s)=>Buffer.from(s, 'hex'))
+    action.extraData = Buffer.from(obj.extraData, 'hex')
     return action
   }
 
@@ -179,10 +179,14 @@ class Header extends MiniData {
     return ab2h(hash(this.toBytes()))
   }
 
-  mixHash() {
-    return ab2h(hash(Buffer(h2ab(
-        ab2h(this.prev) + ab2h(this.prevTotalWork.toBuffer())
-    ))))
+  mixHash () {
+    return ab2h(hash(Buffer.concat([
+      Buffer(this.prev),
+      this.prevTotalWork.toBuffer(),
+      Buffer(this.actroot),
+      Buffer(this.miner),
+      this.time.toBuffer()
+    ])))
   }
 
   toJSON () {

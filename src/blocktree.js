@@ -3,20 +3,21 @@ const L = immutable.List
 const debug = require('debug')('miniflow:state')
 const ab2h = require('array-buffer-to-hex')
 const h2ab = require('hex-to-array-buffer')
+const BN = require('bn.js')
 
 const ZERO = ab2h(new ArrayBuffer(32))
 
 class State {
-  constructor(multistate) {
+  constructor (multistate) {
     this.multistate = multistate
-  }
-
-  isUnspent (txid, idx) {
-    return this.multistate.has(L(['utxo', txid, idx]))
   }
 
   hasHeader (header) {
     return this.multistate.has(L(['header', header]))
+  }
+
+  getHeader (header) {
+    return this.multistate.get(L(['header', header]))
   }
 
   addHeader (header) {
@@ -27,12 +28,22 @@ class State {
     this.multistate = this.multistate.set(L(['header', header.hashID()]), header)
   }
 
+  isUnspent (txid, idx) {
+    if(typeof(txid) != 'string') throw new Error('use hex string keys for txid')
+    if(typeof(idx) != 'string') throw new Error('use hex string keys for idx')
+    return this.multistate.has(L(['utxo', txid, idx]))
+  }
+
   addUTXO (txid, idx) {
+    if(typeof(txid) != 'string') throw new Error('use hex string keys for txid')
+    if(typeof(idx) != 'string') throw new Error('use hex string keys for idx')
     debug('adding utxo %O', [txid, idx])
     this.multistate = this.multistate.set(L(['utxo', txid, idx]), true)
   }
 
   delUTXO (txid, idx) {
+    if(typeof(txid) != 'string') throw new Error('use hex string keys for txid')
+    if(typeof(idx) != 'string') throw new Error('use hex string keys for idx')
     debug('deleting utxo %O', [txid, idx])
     this.multistate = this.multistate.delete(L(['utxo', txid, idx]))
   }
@@ -61,30 +72,32 @@ class State {
       this.addAction(action)
       action.outputs.forEach((output, idx) => {
         debug('adding utxo idx %s output %O action %O', idx, output, action)
-        this.addUTXO(action.hashID(), idx)
+        this.addUTXO(action.hashID(), (new BN(idx)).toBuffer().toString('hex'))
       })
       action.inputs.forEach((input) => {
         debug('deleting utxo given in input %O from action %O', input, action)
         const ACTION = ab2h(input.action)
         if (ACTION != '') {
-          this.delUTXO(ACTION, input.index.toNumber()) // TODO value types
+          this.delUTXO(ACTION, input.index.toString('hex'))
         } else {
-          this.delUTXO(action.hashID(), input.index.toNumber())
+          this.delUTXO(action.hashID(), input.index.toString('hex'))
         }
       })
     })
-
   }
-
 }
 
 class BlockTree {
-  constructor () {
+  constructor (block0) {
     this.multistate = immutable.Map()
     this.refs = new Map()
 
     this.multistate = this.multistate.set(L(['header', ZERO]), ZERO)
     this.refs.set(ZERO, this.multistate)
+
+    let s = this.checkout(ZERO)
+    s.insertBlock(block0)
+    this.commit(block0.header.hashID(), s)
   }
 
   // future: lockless transparent reference giving `addHeader`, etc
@@ -97,10 +110,9 @@ class BlockTree {
 
   commit (header, state) {
     if (this.refs.has(header)) throw new Error('state already commit for this header')
-    debug('committing stage to latest hash %O: %O', header, state)
+    debug('committing stage to header %O: %O', header, state)
     this.refs.set(header, state.multistate)
   }
-
 }
 
 module.exports = { BlockTree }

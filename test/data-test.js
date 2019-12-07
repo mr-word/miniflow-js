@@ -104,8 +104,8 @@ describe('buffers etc', () => {
       (new BN(2)).pow(new BN(256))
     ]
     debug('%O', nums.map((n) => n.toArray()))
-    let n255s = (new Buffer(32)).fill(255)
-    let bn256m1 = (((new BN(2)).pow(new BN(256))).sub(new BN(1))).toArray()
+    const n255s = (new Buffer(32)).fill(255)
+    const bn256m1 = (((new BN(2)).pow(new BN(256))).sub(new BN(1))).toArray()
     want(ab2h(n255s)).equal(ab2h(Buffer(bn256m1)))
   })
 })
