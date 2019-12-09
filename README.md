@@ -7,18 +7,6 @@ Miniflow is a POC and sister network for [manaflow](https://word.site/2019/11/26
 
 Manaflow will include user-specified transition logic (smart contracts) while maintaining log-span validation and pushing it to its logical limit.
 
-### note dump
-
-* architecture could be easily adopted for UTXO systems with finite 'standard transaction' types
-* * the only (logical) structure maintained by miniflow is a set of non-fungible contiguous regions (splittable but not joinable) and fungible garbage regions (which make a coin-like)
-* * * Nevertheless, this is a minimal demonstration of threading consensus-validated state through UTXO, specifically *without maintaining an auxiliary state DB*
-* the only user-specified validation condition is plain (multi)signature, "locks", and "needs"
-* * UTXO locks mean that it cannot be spent while another UTXO exists, and needs means that it requires another UTXO to exist to be spent (both allow K of N quorum, giving circuits)
-* * 'locks' are implemented with 'NTXI' reducer similar to RTXI. Still does not require auxiliary state DB, just more fields in shardlet reducer.
-* * 'needs' same concept but requires UTXO (without spending it) to be able to spend. **Still all log span**.
-* [double-life fee](https://word.site/2019/12/03/double-life-fee/) for simple state rent: UTXO expire when they are at least half as old as the chain itself
-* [dpow](https://word.site/2019/11/12/dynamic-pow/) - no difficulty/TBT, no hard-coded max block frequency. Thin client header chain not throttled, it will be big (server size) but still tiny compared to possible size of chain data (data center size).
-
 ### key dependencies
 
 * RLP for serialization
@@ -52,7 +40,7 @@ During strictly reverse validation, this working set might grow very large befor
 
 * **Validation**: `O(log(n))`. It wants to be big!
 * **Spec** Some scattered attempts at a rigorous spec. Completing a spec should be feasible and it is surprising one does not exist.
-* **State Logic** No global state accessible to script, and even UTXO state is local. See [this post]() if you have too much bitcoin and you're thinking "but bitcoin opcodes *are* turing complete!".
+* **State Logic** No global state accessible to script, and even UTXO state is local. See [this post](https://word.site/2019/11/20/utxo-vs-global-state/) if you have too much bitcoin and you're thinking "but bitcoin opcodes *are* turing complete!".
 * **State Rent** None, state persists indefinitely
 * **Thin Proofs**: Can prove "necessarily spent" / "possibly unspent", but **cannot prove "necessarily unspent"**.
 * **Consensus**: Heavily throttled (10 min) POW, optimized to keep thin clients thin.
@@ -97,13 +85,24 @@ Very similar to EVM, with a focus on formal verification.
 * **Validation**: `O(log(n))`
 * **Spec**: Tiny spec formalized ASAP
 * **State Logic**: Outputs can be locked by, or require, a UTXO to be present at the (logical) moment it is validated. Application-wise, besides coin-like "fungible garbage regions", there are non-fungible regions, and conditions that can be built from need/lock circuits.
-* **State rent**: Simple [double-life fee]() for rent.
-* **Consensus**: Pure [dpow]()
+* **State rent**: Simple [double-life fee](https://word.site/2019/12/03/double-life-fee/) for rent.
+* **Consensus**: Pure [dpow](https://word.site/2019/11/12/dynamic-pow/)
 
 #### Manaflow
 
 * **Validation**: `O(log(n))`
 * **Spec**: Spec first / concurrently with POC
 * **State Logic**: Output scripts have access to the entire evaluated transaction pair for each input (the input and its consumed output), as well as the header and some other shardlet context.
-* **State Rent**: Model based [double-life fee]() with script having some control
-* **Consensus**: Assuming it is proven to work, pure [dpow]()
+* **State Rent**: Model based [double-life fee](https://word.site/2019/12/03/double-life-fee/) with script having some control
+* **Consensus**: Assuming it is proven to work, pure [dpow](https://word.site/2019/11/12/dynamic-pow/)
+
+
+## note dump
+
+* architecture could be easily adopted for UTXO systems with finite 'standard transaction' types
+* * the only (logical) structure maintained by miniflow is a set of non-fungible contiguous regions (splittable but not joinable) and fungible garbage regions (which make a coin-like)
+* * * Nevertheless, this is a minimal demonstration of threading consensus-validated state through UTXO, specifically *without maintaining an auxiliary state DB*
+* the only user-specified validation condition is plain (multi)signature, "locks", and "needs"
+* * UTXO locks mean that it cannot be spent while another UTXO exists, and needs means that it requires another UTXO to exist to be spent (both allow K of N quorum, giving circuits)
+* * 'locks' are implemented with 'NTXI' reducer similar to RTXI. Still does not require auxiliary state DB, just more fields in shardlet reducer.
+* * 'needs' same concept but requires UTXO (without spending it) to be able to spend. **Still all log span**.
