@@ -3,7 +3,7 @@ const want = require('chai').expect
 const ab2h = require('array-buffer-to-hex')
 const BN = require('bn.js')
 
-const debug = require('debug')('miniflow:tests')
+const debug = require('debug')('miniflow:data')
 
 bn2hex = (bn) => ab2h(bn.toBuffer())
 n2hex = (n) => bn2hex(new BN(n))
@@ -12,11 +12,7 @@ const outputJSON = {
   left: n2hex(0),
   right: n2hex(1),
   data: 'daba',
-  lockQuorum: n2hex(0),
-  needQuorum: n2hex(0),
-  keyQuorum: n2hex(2),
-  locks: [],
-  needs: [],
+  quorum: n2hex(2),
   pubkeys: []
 }
 
@@ -30,7 +26,6 @@ const actionJSON = {
   validUntil: n2hex(1),
   inputs: [inputJSON],
   outputs: [outputJSON],
-  requireHeader: '',
   signatures: ['b0bd55', 'cadf55'],
   extraData: 'e5dada' // NOT SIGNED - inserted/replaced by block producer
 }

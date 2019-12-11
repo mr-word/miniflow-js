@@ -19,33 +19,21 @@ const out0 = {
   left: '00',
   right: '00',
   data: '',
-  lockQuorum: 0,
-  needQuorum: 0,
-  keyQuorum: 0,
-  locks: [],
-  needs: [],
+  quorum: 0,
   pubkeys: []
 }
 const out1 = {
   left: '00',
   right: '01',
   data: '',
-  lockQuorum: 0,
-  needQuorum: 0,
-  keyQuorum: 0,
-  locks: [],
-  needs: [],
+  quorum: 0,
   pubkeys: []
 }
 const out2 = {
   left: '01',
   right: 'f'.repeat(64),
   data: '',
-  lockQuorum: 0,
-  needQuorum: 0,
-  keyQuorum: 0,
-  locks: [],
-  needs: [],
+  quorum: 0,
   pubkeys: []
 }
 
@@ -54,7 +42,6 @@ const act0 = {
   validUntil: '',
   inputs: [in0],
   outputs: [out0, out1, out2],
-  requireHeader: '',
   signatures: [],
   extraData: ''
 }
