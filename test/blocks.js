@@ -10,7 +10,7 @@ const BN = require('bn.js')
 const block1 = Block.fromJSON({
   header: {
     prev: block0.header.hashID(),
-    actroot: '', // .remerk()
+    root: '', // .remerk()
     xtrs: '',
     node: ab2h(Buffer(keypair.publicKey)),
     time: new Varnum(Date.now()).toHex(),
@@ -18,8 +18,8 @@ const block1 = Block.fromJSON({
     work: 'f'.repeat(64) // .work()
   },
   actions: [{
-    validSince: 0,
-    validUntil: 0,
+    validSince: '00',
+    validUntil: '00',
     inputs: [],
     outputs: [],
     requireHeader: '',

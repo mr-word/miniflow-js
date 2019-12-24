@@ -19,21 +19,21 @@ const out0 = {
   left: '00',
   right: '00',
   data: '',
-  quorum: 0,
+  quorum: '',
   pubkeys: []
 }
 const out1 = {
   left: '00',
   right: '01',
   data: '',
-  quorum: 0,
+  quorum: '',
   pubkeys: []
 }
 const out2 = {
   left: '01',
   right: 'f'.repeat(64),
   data: '',
-  quorum: 0,
+  quorum: '',
   pubkeys: []
 }
 
@@ -48,7 +48,7 @@ const act0 = {
 
 const hdr0 = {
   prev: '',
-  actroot: '',
+  root: '',
   xtrs: '',
   node: '',
   time: '',

@@ -85,7 +85,7 @@ class Output extends MiniData {
       left: ab2h(this.left),
       right: ab2h(this.right),
       data: ab2h(this.data),
-      quorum: ab2h(this.quorum.toBuffer()),
+      quorum: ab2h(this.quorum),
       pubkeys: this.pubkeys.map(ab2h)
     }
   }
@@ -95,7 +95,7 @@ class Output extends MiniData {
       Buffer(this.left),
       Buffer(this.right),
       Buffer(this.data),
-      this.quorum.toBuffer(),
+      Buffer(this.quorum),
       this.pubkeys.map((x) => Buffer(x))
     ]
   }
@@ -105,7 +105,7 @@ class Output extends MiniData {
     output.left = h2ab(obj.left)
     output.right = h2ab(obj.right)
     output.data = h2ab(obj.data)
-    output.quorum = new BN(obj.quorum)
+    output.quorum = h2ab(obj.quorum)
     output.pubkeys = obj.pubkeys.map(h2ab)
     return output
   }
@@ -115,7 +115,7 @@ class Output extends MiniData {
       left: ab2h(list[0]),
       right: ab2h(list[1]),
       data: ab2h(list[2]),
-      quorum: new BN(list[3]),
+      quorum: ab2h(list[3]),
       pubkeys: list[4].map(ab2h)
     })
   }
@@ -151,8 +151,8 @@ class Action extends MiniData {
   static fromJSON (obj) {
     debug('Action.fromJSON %O', obj)
     const action = new Action()
-    action.validSince = (new BN(obj.validSince)).toBuffer()
-    action.validUntil = (new BN(obj.validUntil)).toBuffer()
+    action.validSince = Buffer.from(obj.validSince, 'hex')
+    action.validUntil = Buffer.from(obj.validUntil, 'hex')
     action.inputs = obj.inputs.map((i) => Input.fromJSON(i))
     action.outputs = obj.outputs.map((o) => Output.fromJSON(o))
     action.signatures = obj.signatures.map((s) => Buffer.from(s, 'hex'))
@@ -163,8 +163,8 @@ class Action extends MiniData {
   static fromPreRLP (list) {
     debug('Action.fromPreRLP %O', list)
     return this.fromJSON({
-      validSince: new BN(list[0]),
-      validUntil: new BN(list[1]),
+      validSince: ab2h(list[0]),
+      validUntil: ab2h(list[1]),
       inputs: list[2].map((i) => Input.fromPreRLP(i).toJSON()),
       outputs: list[3].map((o) => Output.fromPreRLP(o).toJSON()),
       signatures: list[4].map(ab2h),
@@ -181,7 +181,7 @@ class Header extends MiniData {
   mixHash () {
     return ab2h(hash(Buffer.concat([
       Buffer(this.prev),
-      Buffer(this.actroot),
+      Buffer(this.root),
       Buffer(this.xtrs),
       Buffer(this.node),
       Buffer(this.time)
@@ -191,7 +191,7 @@ class Header extends MiniData {
   toJSON () {
     return {
       prev: ab2h(this.prev),
-      actroot: ab2h(this.actroot),
+      root: ab2h(this.root),
       xtrs: ab2h(this.xtrs),
       node: ab2h(this.node),
       time: ab2h(this.time),
@@ -203,7 +203,7 @@ class Header extends MiniData {
   toPreRLP () {
     return [
       Buffer(this.prev),
-      Buffer(this.actroot),
+      Buffer(this.root),
       Buffer(this.xtrs),
       Buffer(this.node),
       Buffer(this.time),
@@ -216,7 +216,7 @@ class Header extends MiniData {
     debug('Header.fromJSON %O', obj)
     const header = new Header()
     header.prev = h2ab(obj.prev)
-    header.actroot = h2ab(obj.actroot)
+    header.root = h2ab(obj.root)
     header.xtrs = h2ab(obj.xtrs)
     header.node = h2ab(obj.node)
     header.time = h2ab(obj.time)
@@ -229,7 +229,7 @@ class Header extends MiniData {
     debug('Header.fromPreRLP %O', list)
     return this.fromJSON({
       prev: ab2h(list[0]),
-      actroot: ab2h(list[1]),
+      root: ab2h(list[1]),
       xtrs: ab2h(list[2]),
       node: ab2h(list[3]),
       time: ab2h(list[4]),
@@ -242,7 +242,7 @@ class Header extends MiniData {
 class Block extends MiniData {
   remerk () {
     const actIDs = this.actions.map((a) => h2ab(a.hashID()))
-    this.header.actroot = ab2h(merkelize(actIDs))
+    this.header.root = merkelize(actIDs)
     return this
   }
 

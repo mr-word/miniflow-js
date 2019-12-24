@@ -32,7 +32,7 @@ const actionJSON = {
 
 const headerJSON = {
   prev: '',
-  actroot: '',
+  root: '',
   xtrs: '',
   node: '',
   time: n2hex(1),

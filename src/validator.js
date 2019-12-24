@@ -57,9 +57,9 @@ class Validator {
     debug(`givenHash ${header.work.toString('hex')}`)
     need(header.work.toString('hex') == trueHash, 'proof of work does not validate')
 
-    const root = header.actroot
+    const root = header.root
     block.remerk()
-    need(header.actroot == root, 'merkle root must verify')
+    need(ab2h(header.root) == ab2h(root), 'merkle root must verify')
 
     state.addHeader(header)
 

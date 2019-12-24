@@ -21,7 +21,7 @@ describe('miner', () => {
   it('mines a header mixhash', () => {
     const header = Header.fromJSON({
       prev: '',
-      actroot: '',
+      root: '',
       xtrs: '',
       node: '',
       time: '00',
@@ -31,7 +31,7 @@ describe('miner', () => {
     const mix = header.mixHash()
     const checkmix = ab2h(hash(Buffer.concat([
       Buffer.from(header.prev, 'hex'),
-      Buffer.from(header.actroot, 'hex'),
+      Buffer.from(header.root, 'hex'),
       Buffer.from(header.xtrs, 'hex'),
       Buffer.from(header.node, 'hex'),
       Buffer.from(header.time, 'hex')
