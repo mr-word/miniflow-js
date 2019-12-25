@@ -63,8 +63,8 @@ const blk0 = {
 
 const block = data.Block.fromJSON(blk0)
 block.remerk()
-const bangwork = ab2h(hash(Buffer(h2ab(block.header.mixHash() + hdr0.node + hdr0.fuzz)))) // TODO fix
-debug(`bangwork ${bangwork}`)
-block.work = bangwork
+const bangwork = hash(Buffer(h2ab(block.header.mixHash() + hdr0.fuzz))) // TODO fix
+debug(`bangwork ${ab2h(bangwork)}`)
+block.header.work = bangwork
 
 module.exports = block

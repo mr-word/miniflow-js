@@ -5,7 +5,6 @@ const ab2h = require('array-buffer-to-hex')
 const h2ab = require('hex-to-array-buffer')
 const BN = require('bn.js')
 
-const { BlockTree } = require('../src/blocktree.js')
 const { Varnum } = require('../src/data.js')
 const { hash } = require('../src/crypto.js')
 
@@ -47,7 +46,7 @@ class Validator {
     debug(`headWorkNum ${headWorkNum.toString(16)}`)
 
     // dpow
-    need(headWorkNum.gt(prevWorkNum.mul(new BN(2))), 'not enough work')
+    need(headWorkNum.lt(prevWorkNum.mul(new BN(3)).div(new BN(2))), 'not enough work')
 
     const mix = header.mixHash()
     const fuzz = header.fuzz
@@ -55,7 +54,7 @@ class Validator {
     const trueHash = ab2h(hash(Buffer.concat(workload)))
     debug(`trueHash ${trueHash}`)
     debug(`givenHash ${header.work.toString('hex')}`)
-    need(header.work.toString('hex') == trueHash, 'proof of work does not validate')
+    need(header.work.toString('hex') === trueHash, 'proof of work does not validate')
 
     const root = header.root
     block.remerk()

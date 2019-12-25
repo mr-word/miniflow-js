@@ -84,6 +84,13 @@ class State {
       })
     })
   }
+
+  toJSON () {
+    const json = {}
+    for (const key in multistate) {
+      json[key] = multistate.get(key)
+    }
+  }
 }
 
 class BlockTree {
