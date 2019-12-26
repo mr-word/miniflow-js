@@ -27,6 +27,11 @@ class State {
     this.multistate = this.multistate.set(L(['header', header.hashID()]), header)
   }
 
+  getMetaState (headID) {
+    const meta = this.multistate.get(L(['meta', headID]))
+    if (!meta) throw new Error('no metadata available for this state')
+  }
+
   isUnspent (txid, idx) {
     if (typeof (txid) !== 'string') throw new Error('use hex string keys for txid')
     if (typeof (idx) !== 'string') throw new Error('use hex string keys for idx')

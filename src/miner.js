@@ -10,12 +10,22 @@ function padleft (s, n, c) {
   return c.repeat(n - s.length) + s
 }
 
-function work (mixhash, difficulty) {
-  debug(`data  ${mixhash}`)
+function workOnHeader (header, difficulty) {
+  const mix = header.mixHash()
+  return work(mix, difficulty)
+}
+
+function work (mixhash, difficulty, timeseed) {
+  debug(`mix   ${mixhash}`)
   debug(`tuff  ${padleft(difficulty.toString('hex'), 64, '0')}`)
   let w
   let i = 0
-  const t = Date.now()
+  let t
+  if (timeseed) {
+    t = timeseed
+  } else {
+    t = Date.now()
+  }
   let n = t
   mixhash = Buffer(h2ab(mixhash))
   while (true) {

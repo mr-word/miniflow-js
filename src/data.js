@@ -61,7 +61,7 @@ class UTag extends MiniData {
   }
 
   static fromJSON (obj) {
-    debug('UTag.fromJSON %O', obj)
+    // debug('UTag.fromJSON %O', obj)
     const input = new Input()
     input.action = Buffer.from(obj.action, 'hex'),
     input.index = (new BN(obj.index)).toBuffer()
@@ -69,7 +69,7 @@ class UTag extends MiniData {
   }
 
   static fromPreRLP (list) {
-    debug('UTag.fromPreRLP %O', list)
+    // debug('UTag.fromPreRLP %O', list)
     return this.fromJSON({
       action: list[0].toString('hex'),
       index: new BN(list[1].toString('hex'), 16)
@@ -149,7 +149,7 @@ class Action extends MiniData {
   }
 
   static fromJSON (obj) {
-    debug('Action.fromJSON %O', obj)
+    // debug('Action.fromJSON %O', obj)
     const action = new Action()
     action.validSince = Buffer.from(obj.validSince, 'hex')
     action.validUntil = Buffer.from(obj.validUntil, 'hex')
@@ -161,7 +161,7 @@ class Action extends MiniData {
   }
 
   static fromPreRLP (list) {
-    debug('Action.fromPreRLP %O', list)
+    // debug('Action.fromPreRLP %O', list)
     return this.fromJSON({
       validSince: ab2h(list[0]),
       validUntil: ab2h(list[1]),
@@ -213,7 +213,7 @@ class Header extends MiniData {
   }
 
   static fromJSON (obj) {
-    debug('Header.fromJSON %O', obj)
+    // debug('Header.fromJSON %O', obj)
     const header = new Header()
     header.prev = h2ab(obj.prev)
     header.root = h2ab(obj.root)
@@ -226,7 +226,7 @@ class Header extends MiniData {
   }
 
   static fromPreRLP (list) {
-    debug('Header.fromPreRLP %O', list)
+    // debug('Header.fromPreRLP %O', list)
     return this.fromJSON({
       prev: ab2h(list[0]),
       root: ab2h(list[1]),
@@ -241,9 +241,21 @@ class Header extends MiniData {
 
 class Block extends MiniData {
   remerk () {
-    const actIDs = this.actions.map((a) => h2ab(a.hashID()))
-    this.header.root = merkelize(actIDs)
+    if (this.actions.length == 0) {
+      this.header.root = Buffer.from([])
+    } else {
+      const actIDs = this.actions.map((a) => h2ab(a.hashID()))
+      this.header.root = merkelize(actIDs)
+    }
     return this
+  }
+
+  // recomputes `work` from given header (mixhash + fuzz)
+  // to find a valid fuzz/work, use miner.work(mixhash, difficulty)
+  rework () {
+    const mix = Buffer.from(this.header.mixHash(), 'hex')
+    const fuzz = this.header.fuzz
+    this.header.work = hash(Buffer.concat([mix, fuzz]))
   }
 
   toJSON () {
@@ -261,7 +273,7 @@ class Block extends MiniData {
   }
 
   static fromJSON (obj) {
-    debug('Block.fromJSON %O', obj)
+    // debug('Block.fromJSON %O', obj)
     const block = new Block()
     block.header = Header.fromJSON(obj.header)
     block.actions = obj.actions.map((a) => Action.fromJSON(a))
@@ -269,7 +281,7 @@ class Block extends MiniData {
   }
 
   static fromPreRLP (list) {
-    debug('Block.fromPreRLP %O', list)
+    // debug('Block.fromPreRLP %O', list)
     return this.fromJSON({
       header: Header.fromPreRLP(list[0]).toJSON(),
       actions: list[1].map((a) => Action.fromPreRLP(a).toJSON())
