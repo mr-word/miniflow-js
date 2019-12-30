@@ -1,0 +1,47 @@
+{
+  "header": {
+    "prev": "",
+    "root": "83501e01b1e789ac01552106c4a39c23e9bf6ed11d0de1170da5d905d6cbc245",
+    "xtrs": "",
+    "node": "",
+    "time": "",
+    "fuzz": ""
+  },
+  "actions": [
+    {
+      "validSince": "",
+      "validUntil": "",
+      "inputs": [
+        {
+          "action": "",
+          "index": "00"
+        }
+      ],
+      "outputs": [
+        {
+          "left": "00",
+          "right": "00",
+          "data": "",
+          "quorum": "",
+          "pubkeys": []
+        },
+        {
+          "left": "00",
+          "right": "01",
+          "data": "",
+          "quorum": "",
+          "pubkeys": []
+        },
+        {
+          "left": "01",
+          "right": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "data": "",
+          "quorum": "",
+          "pubkeys": []
+        }
+      ],
+      "signatures": [],
+      "extraData": ""
+    }
+  ]
+}
