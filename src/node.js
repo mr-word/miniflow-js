@@ -18,6 +18,12 @@ class MiniNode {
   }
 
   load (datadir) {
+    // load any remaining block
+    // recursively load `prev` blocks, counting cumulative work
+  }
+
+  loadBranch() {
+    //
   }
 
   makeBlock (afterHeader, actions, time) {
@@ -36,20 +42,18 @@ class MiniNode {
         xtrs: '',
         node: '',
         time: timestr,
-        fuzz: '', // .mine()
-        work: '' // .mine()
+        fuzz: '' // .mine()
       },
       actions: actions
     })
     block.remerk()
 
-    const tuff = new BN(Buffer.from(prevHeader.work, 'hex')) // TODO dpow
+    const tuff = new BN(Buffer.from(prevHeader.hashID(), 'hex')) // TODO dpow
     const mix = block.header.mixHash()
     const fuzz = miner.work(mix, tuff, time)
     debug('mix', mix)
     debug('fuzz', fuzz)
     block.header.fuzz = fuzz
-    block.rework()
     debug(block)
     return block
   }

@@ -40,21 +40,13 @@ class Validator {
     debug('evaluated header\'s prev: %s, prevHeader %O', PREV, prev)
 
     const OVER256 = (new BN(2)).pow(new BN(256))
-    const prevWorkNum = OVER256.sub(new BN(Buffer(prev.work)))
+    const prevWorkNum = OVER256.sub(new BN(Buffer.from(prev.hashID(), 'hex')))
 
-    const headWorkNum = OVER256.sub(new BN(Buffer(header.work)))
+    const headWorkNum = OVER256.sub(new BN(Buffer.from(header.hashID(), 'hex')))
     debug(`headWorkNum ${headWorkNum.toString(16)}`)
 
     // dpow
     need(headWorkNum.lt(prevWorkNum.mul(new BN(3)).div(new BN(2))), 'not enough work')
-
-    const mix = header.mixHash()
-    const fuzz = header.fuzz
-    const workload = [Buffer.from(mix, 'hex'), Buffer.from(fuzz, 'hex')]
-    const trueHash = ab2h(hash(Buffer.concat(workload)))
-    debug(`trueHash ${trueHash}`)
-    debug(`givenHash ${header.work.toString('hex')}`)
-    need(header.work.toString('hex') === trueHash, 'proof of work does not validate')
 
     const root = header.root
     block.remerk()

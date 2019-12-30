@@ -175,7 +175,7 @@ class Action extends MiniData {
 
 class Header extends MiniData {
   hashID () {
-    return ab2h(hash(this.toBytes()))
+    return ab2h(hash(Buffer.concat([Buffer.from(this.mixHash(), 'hex'), Buffer.from(this.fuzz)])))
   }
 
   mixHash () {
@@ -195,8 +195,7 @@ class Header extends MiniData {
       xtrs: ab2h(this.xtrs),
       node: ab2h(this.node),
       time: ab2h(this.time),
-      fuzz: ab2h(this.fuzz),
-      work: ab2h(this.work)
+      fuzz: ab2h(this.fuzz)
     }
   }
 
@@ -207,8 +206,7 @@ class Header extends MiniData {
       Buffer(this.xtrs),
       Buffer(this.node),
       Buffer(this.time),
-      Buffer(this.fuzz),
-      Buffer(this.work)
+      Buffer(this.fuzz)
     ]
   }
 
@@ -221,7 +219,6 @@ class Header extends MiniData {
     header.node = h2ab(obj.node)
     header.time = h2ab(obj.time)
     header.fuzz = h2ab(obj.fuzz)
-    header.work = h2ab(obj.work)
     return header
   }
 
@@ -233,8 +230,7 @@ class Header extends MiniData {
       xtrs: ab2h(list[2]),
       node: ab2h(list[3]),
       time: ab2h(list[4]),
-      fuzz: ab2h(list[5]),
-      work: ab2h(list[6])
+      fuzz: ab2h(list[5])
     })
   }
 }
@@ -248,14 +244,6 @@ class Block extends MiniData {
       this.header.root = merkelize(actIDs)
     }
     return this
-  }
-
-  // recomputes `work` from given header (mixhash + fuzz)
-  // to find a valid fuzz/work, use miner.work(mixhash, difficulty)
-  rework () {
-    const mix = Buffer.from(this.header.mixHash(), 'hex')
-    const fuzz = this.header.fuzz
-    this.header.work = hash(Buffer.concat([mix, fuzz]))
   }
 
   toJSON () {

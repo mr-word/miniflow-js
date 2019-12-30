@@ -12,9 +12,5 @@ describe('manaflow node', () => {
     const BANG = bang.header.hashID()
     const resultBlock = node.makeBlock(BANG, [], 123456789)
     want(ab2h(resultBlock.header.prev)).equal(bang.header.hashID())
-    const givenWork = resultBlock.header.work
-    resultBlock.rework()
-    const rework = resultBlock.header.work
-    want(ab2h(givenWork)).equal(ab2h(rework))
   })
 })

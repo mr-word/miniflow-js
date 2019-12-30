@@ -36,8 +36,7 @@ const headerJSON = {
   xtrs: '',
   node: '',
   time: n2hex(1),
-  fuzz: '',
-  work: '00111111'
+  fuzz: ''
 }
 
 const blockJSON = {
